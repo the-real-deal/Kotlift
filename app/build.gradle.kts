@@ -41,8 +41,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.core.ktx.v1180)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -58,11 +57,19 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // View Model
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose.android)
 
     // Data store
     implementation(libs.androidx.datastore.preferences)
+
+    // Gifs and images
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+
+    // Charts
+    //noinspection UseTomlInstead
+    implementation ("io.github.ehsannarmani:compose-charts:0.2.5")
 
     // Koin
     implementation(libs.koin.androidx.compose)
@@ -72,7 +79,6 @@ dependencies {
 
     // Object serialization
     implementation(libs.ktor.serialization.kotlinx.json)
-
 
     // Db communication and Ktor engine asked by Supabase
     implementation(platform(libs.bom))
