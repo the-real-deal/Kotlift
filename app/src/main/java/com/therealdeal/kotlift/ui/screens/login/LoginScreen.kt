@@ -38,8 +38,8 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             AuthHeader(
-                title = "Bentornato!",
-                subtitle = "Accedi per continuare con Kotlift"
+                title = "Welcome!",
+                subtitle = "Your fitness journey continues here"
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -64,7 +64,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             AuthButton(
-                text = "Accedi",
+                text = "Login",
                 onClick = { onNavigate(LoginNavigation.Home) },
                 enabled = email.isNotBlank() && password.isNotBlank()
             )
@@ -72,8 +72,8 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             ClickableFooterText(
-                normalText = "Non hai un account?",
-                clickableText = "Registrati",
+                normalText = "Don't have an account?",
+                clickableText = "Register",
                 onClick = { onNavigate(LoginNavigation.Register) }
             )
         }
