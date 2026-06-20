@@ -3,9 +3,10 @@ package com.therealdeal.kotlift.ui.screens.stats
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Scale
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -38,12 +39,12 @@ fun StatsScreen(onNavigate: (StatsNavigation) -> Unit, innerPadding: PaddingValu
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                MiniStatCard("Volume", "42.5k kg", Icons.AutoMirrored.Filled.List, AppGreen, Modifier.weight(1f))
-                MiniStatCard("Calories", "12.400", Icons.Default.Face, IconRed, Modifier.weight(1f))
+                MiniStatCard("Volume", "42.5k kg", Icons.Default.Scale, AppGreen, Modifier.weight(1f))
+                MiniStatCard("Calories", "12,400", Icons.Default.LocalFireDepartment, IconRed, Modifier.weight(1f))
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                MiniStatCard("Workouts", "12", Icons.Default.Face, IconBlue, Modifier.weight(1f))
-                MiniStatCard("Avg Time", "54 min", Icons.AutoMirrored.Filled.KeyboardArrowLeft, IconPurple, Modifier.weight(1f))
+                MiniStatCard("Sessions", "12", Icons.Default.FitnessCenter, IconBlue, Modifier.weight(1f))
+                MiniStatCard("Avg Time", "54 min", Icons.Default.Timer, IconPurple, Modifier.weight(1f))
             }
         }
 

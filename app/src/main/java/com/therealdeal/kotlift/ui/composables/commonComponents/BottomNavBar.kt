@@ -3,16 +3,21 @@ package com.therealdeal.kotlift.ui.composables.commonComponents
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.automirrored.outlined.DirectionsRun
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.FitnessCenter
+import androidx.compose.material.icons.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.DirectionsRun
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.therealdeal.kotlift.ui.theme.Transparent
 import com.therealdeal.kotlift.navigation.Route
 import androidx.navigation.NavDestination.Companion.hasRoute
 
@@ -22,9 +27,9 @@ sealed class BottomNavItem(
     val icon: ImageVector
 ) {
     data object Home : BottomNavItem(Route.Home, "Home", Icons.Outlined.Home)
-    data object Workouts : BottomNavItem(Route.Workouts, "Workouts", Icons.Outlined.Face)
-    data object Stats : BottomNavItem(Route.Stats, "stats", Icons.AutoMirrored.Outlined.ArrowForward)
-    data object Run : BottomNavItem(Route.Run, "run", Icons.Outlined.Home)
+    data object Workouts : BottomNavItem(Route.Workouts, "Workouts", Icons.Outlined.FitnessCenter)
+    data object Stats : BottomNavItem(Route.Stats, "Stats", Icons.AutoMirrored.Outlined.TrendingUp)
+    data object Run : BottomNavItem(Route.Run, "Run", Icons.AutoMirrored.Outlined.DirectionsRun)
     data object Profile : BottomNavItem(Route.Profile, "Profile", Icons.Outlined.Person)
 }
 
@@ -99,7 +104,7 @@ fun AppBottomNavBar(
                     selectedTextColor = MaterialTheme.colorScheme.primary,
                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = Transparent
+                    indicatorColor = Color.Transparent
                 )
             )
         }

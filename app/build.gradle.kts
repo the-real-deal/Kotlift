@@ -90,4 +90,7 @@ dependencies {
 
     implementation(libs.functions.kt)
     implementation(libs.ktor.client.content.negotiation)
+
+    // Matherial Icons
+    implementation(libs.androidx.compose.material.icons.extended)
 }

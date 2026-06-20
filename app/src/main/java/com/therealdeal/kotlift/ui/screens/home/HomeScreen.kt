@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -40,9 +44,9 @@ fun HomeScreen(onNavigate: (HomeNavigation) -> Unit, innerPadding : PaddingValue
                     .offset(y = (-30).dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                StatCard("Day Streak", "0", Icons.Default.Face, IconRed, Modifier.weight(1f))
-                StatCard("Workouts", "0", Icons.Default.Face, AppGreen, Modifier.weight(1f))
-                StatCard("Records", "0", Icons.Default.Face, IconYellow, Modifier.weight(1f))
+                StatCard("Day Streak", "0", Icons.Default.LocalFireDepartment, IconRed, Modifier.weight(1f))
+                StatCard("Sessions", "0", Icons.Default.FitnessCenter, AppGreen, Modifier.weight(1f))
+                StatCard("Trophy", "0", Icons.Default.EmojiEvents, IconYellow, Modifier.weight(1f))
             }
 
             QuickStartCard("Ready to Train?", "Start your workout now", { onNavigate(HomeNavigation.CreateWorkout) })
@@ -60,8 +64,10 @@ fun HomeScreen(onNavigate: (HomeNavigation) -> Unit, innerPadding : PaddingValue
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                SmallActionCard("Exercise Library", Icons.Default.Face, IconBlue,{onNavigate(HomeNavigation.Exercises)}, Modifier.weight(1f))
-                SmallActionCard("Track Progress", Icons.Default.Face, IconPurple,{onNavigate(HomeNavigation.Stats)}, Modifier.weight(1f))
+                SmallActionCard("Exercise Library",
+                    Icons.AutoMirrored.Filled.MenuBook, IconBlue, { onNavigate(HomeNavigation.Exercises) }, Modifier.weight(1f))
+                SmallActionCard("Track Progress",
+                    Icons.AutoMirrored.Filled.TrendingUp, IconPurple, { onNavigate(HomeNavigation.Stats) }, Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(50.dp))

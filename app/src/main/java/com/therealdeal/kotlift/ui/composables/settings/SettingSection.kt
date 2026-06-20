@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,7 +39,7 @@ fun SettingsSection() {
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
-            SettingSwitchItem(Icons.Default.AddCircle, "Dark Mode", true)
+            SettingSwitchItem(Icons.Default.DarkMode, "Dark Mode", true)
             SettingSwitchItem(Icons.Default.Notifications, "Workout Reminders", false)
         }
     }

@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.rounded.Face
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -61,7 +60,7 @@ fun WorkoutCard(
                 val durationText =  "-- min"
                 GenericChip(
                     text = durationText,
-                    icon = Icons.Rounded.Face,
+                    icon = Icons.Filled.History,
                     size = ChipSize.Small,
                     backgroundColor = Color.Transparent,
                     textColor = MaterialTheme.colorScheme.onSurfaceVariant,

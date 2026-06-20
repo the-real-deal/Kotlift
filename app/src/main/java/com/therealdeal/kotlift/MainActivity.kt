@@ -1,11 +1,16 @@
 package com.therealdeal.kotlift
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavDestination.Companion.hasRoute
 //import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -15,9 +20,8 @@ import com.therealdeal.kotlift.navigation.NavGraph
 import com.therealdeal.kotlift.navigation.Route
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-//        val splashScreen = installSplashScreen()
-
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
@@ -25,23 +29,23 @@ class MainActivity : ComponentActivity() {
             KotliftTheme {
                 val navController = rememberNavController()
 
-                // Osserva la destinazione attuale
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
+                val showBottomBar = currentDestination?.let { dest ->
+                            !dest.hasRoute(Route.Login::class) &&
+                            !dest.hasRoute(Route.Register::class)
+                } ?: false
+
                 Scaffold(
                     bottomBar = {
-                        // Usiamo il when per decidere se mostrare o meno la BottomBar
-//                        when {
-//                            // Se la destinazione è nulla, o corrisponde a Login/Register, non mostriamo nulla
-//                            currentDestination == null -> {}
-////                            currentDestination.hasRoute<Route.Login>() -> {}
-////                            currentDestination.hasRoute<Route.Register>() -> {}
-//
-//                            // In tutti gli altri casi, mostra la BottomBar
-//                            else ->
-//                        }
-                        AppBottomNavBar(navController)
+                        AnimatedVisibility(
+                            visible = showBottomBar,
+                            enter = slideInVertically(initialOffsetY = { it }),
+                            exit = slideOutVertically(targetOffsetY = { it })
+                        ) {
+                            AppBottomNavBar(navController)
+                        }
                     }
                 ) { innerPadding ->
                     NavGraph(navController = navController, innerPadding = innerPadding)

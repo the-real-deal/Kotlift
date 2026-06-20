@@ -4,9 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-//import androidx.compose.material.icons.filled.FitnessCenter
-//import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Hub
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
@@ -22,13 +21,13 @@ fun ExerciseInfoCardRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         ExerciseInfoCard(
-            icon = Icons.Filled.Face, // [TODO] fitness center
+            icon = Icons.Filled.FitnessCenter,
             title = "Muscolo Target",
             value = primaryTarget,
             modifier = Modifier.weight(1f)
         )
         ExerciseInfoCard(
-            icon = Icons.Default.Face, // [TODO] icon
+            icon = Icons.Filled.Hub,
             title = "Sinergici",
             value = secondaryTarget,
             modifier = Modifier.weight(1f)

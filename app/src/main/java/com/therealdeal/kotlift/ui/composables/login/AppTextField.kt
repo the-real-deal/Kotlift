@@ -7,6 +7,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,13 +18,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
-import com.therealdeal.kotlift.ui.theme.AppGreen
-import com.therealdeal.kotlift.ui.theme.SurfaceDark
-import com.therealdeal.kotlift.ui.theme.SurfaceVariantDark
-import com.therealdeal.kotlift.ui.theme.TextPrimary
-import com.therealdeal.kotlift.ui.theme.TextSecondary
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 
 @Composable
 fun AppTextField(
@@ -36,17 +32,18 @@ fun AppTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
 
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(text = label, color = TextSecondary) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = TextSecondary) },
+        label = { Text(text = label, color = colors.onSurfaceVariant) },
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = colors.onSurfaceVariant) },
         trailingIcon = if (isPassword) {
             {
-                val image = if (passwordVisible) Icons.Filled.Favorite else Icons.Filled.AccountBox
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = null, tint = TextSecondary)
+                    Icon(imageVector = image, contentDescription = null, tint = colors.onSurfaceVariant)
                 }
             }
         } else null,
@@ -55,15 +52,15 @@ fun AppTextField(
         singleLine = true,
         modifier = modifier.fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary,
-            focusedContainerColor = SurfaceDark,
-            unfocusedContainerColor = SurfaceDark,
-            cursorColor = AppGreen,
-            focusedBorderColor = AppGreen,
-            unfocusedBorderColor = SurfaceVariantDark,
-            focusedLabelColor = AppGreen,
-            unfocusedLabelColor = TextSecondary
+            focusedTextColor = colors.onSurface,
+            unfocusedTextColor = colors.onSurface,
+            focusedContainerColor = colors.surface,
+            unfocusedContainerColor = colors.surface,
+            cursorColor = colors.primary,
+            focusedBorderColor = colors.primary,
+            unfocusedBorderColor = colors.outlineVariant,
+            focusedLabelColor = colors.primary,
+            unfocusedLabelColor = colors.onSurfaceVariant
         )
     )
 }
