@@ -114,4 +114,7 @@ dependencies {
 
     // Matherial Icons
     implementation(libs.androidx.compose.material.icons.extended)
+
+    // Splash Screen
+    implementation(libs.androidx.core.splashscreen)
 }

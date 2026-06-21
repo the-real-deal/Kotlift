@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 
 
 @Composable
-fun ExerciseInfoCardRow(
+fun ExerciseMuscleCardRow(
     primaryTarget: String,
     secondaryTarget: String,
     modifier: Modifier = Modifier

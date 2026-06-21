@@ -12,8 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.therealdeal.kotlift.ui.composables.buttons.BottomButton
-import com.therealdeal.kotlift.ui.screens.workoutDetail.WorkoutDetailUiState
+import com.therealdeal.kotlift.ui.composables.buttons.BottomFloatingButton
 import com.therealdeal.kotlift.ui.composables.cards.ModernExerciseCard
 import com.therealdeal.kotlift.ui.composables.headers.WorkoutDetailHeader
 import com.therealdeal.kotlift.ui.theme.Gray
@@ -106,7 +105,7 @@ fun WorkoutDetailScreen(
                     onBackClick = { onNavigate(WorkoutDetailNavigation.Back) }
                 )
 
-                BottomButton(
+                BottomFloatingButton(
                     text = "Start",
                     onClick = { onNavigate(WorkoutDetailNavigation.ActiveWorkout) },
                     modifier = Modifier

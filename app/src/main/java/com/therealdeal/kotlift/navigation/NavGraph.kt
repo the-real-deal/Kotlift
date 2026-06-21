@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.therealdeal.kotlift.ui.screens.activeWorkout.ActiveWorkoutScreen
@@ -26,15 +27,12 @@ fun navigateOnStack(navController: NavHostController, targetRoute: Route) {
 
 fun navigateAndClear(navController: NavHostController, targetRoute: Route) {
     navController.navigate(targetRoute) {
-        popUpTo(Route.Home) { // navController.graph.findStartDestination().id [TODO]
+        popUpTo(0) {
             inclusive = true
-            saveState = true
         }
         launchSingleTop = true
-        restoreState = true
     }
 }
-
 @Composable
 fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
     Box(Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {

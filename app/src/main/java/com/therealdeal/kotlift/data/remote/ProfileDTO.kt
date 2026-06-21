@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProfileDTO(
-    val id: String, // Maps to the 'id' (uuid) linked to auth.users.id
+    val id: String,
     @SerialName("updated_at") val updatedAt: String?,
     @SerialName("profile_picture") val profilePicture: String?,
     @SerialName("day_streak") val dayStreak: Int,

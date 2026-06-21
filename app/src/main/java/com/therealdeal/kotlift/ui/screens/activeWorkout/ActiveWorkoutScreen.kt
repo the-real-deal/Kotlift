@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.ui.composables.headers.ActiveWorkoutHeader
 import com.therealdeal.kotlift.ui.composables.cards.WorkoutExerciseCard
-import com.therealdeal.kotlift.ui.composables.buttons.BottomButton
+import com.therealdeal.kotlift.ui.composables.buttons.BottomFloatingButton
 import com.therealdeal.kotlift.ui.theme.Gray
 import com.therealdeal.kotlift.navigation.ActiveWorkoutNavigation
 
@@ -100,7 +100,7 @@ fun ActiveWorkoutScreen(
             onCloseClick = { onNavigate(ActiveWorkoutNavigation.Back) }
         )
 
-        BottomButton(
+        BottomFloatingButton(
             text = "Stop",
             onClick = { },
             modifier = Modifier

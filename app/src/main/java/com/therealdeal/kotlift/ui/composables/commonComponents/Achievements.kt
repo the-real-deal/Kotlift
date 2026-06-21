@@ -54,7 +54,8 @@ fun AchievementsSection() {
     var selectedAchievement by remember { mutableStateOf<Achievement?>(null) }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .offset(y = (-40).dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -220,7 +221,6 @@ fun AchievementDetailSheet(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp))
 
-            // Dettagli
             DetailRow(label = "Category", value = achievement.category)
             DetailRow(label = "XP reward", value = "+${achievement.xpReward} XP")
 
@@ -228,7 +228,6 @@ fun AchievementDetailSheet(
                 DetailRow(label = "Unlocked on", value = achievement.unlockedDate)
             }
 
-            // Barra di progresso (solo se non sbloccato e con progresso)
             if (!achievement.isUnlocked && achievement.progress != null) {
                 Spacer(modifier = Modifier.height(12.dp))
 

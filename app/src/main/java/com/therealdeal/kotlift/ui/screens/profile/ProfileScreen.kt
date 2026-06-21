@@ -30,17 +30,17 @@ fun ProfileScreen(onNavigate: (ProfileNavigation) -> Unit, innerPadding : Paddin
         ProfileHeaderSection()
 
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            GoalsCard()
+            //GoalsCard()
 
             Spacer(modifier = Modifier.height(20.dp))
 
             AchievementsSection()
 3
-            Spacer(modifier = Modifier.height(20.dp))
+            // Spacer(modifier = Modifier.height(10.dp))
 
             SettingsSection()
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             ProfileActions()
 

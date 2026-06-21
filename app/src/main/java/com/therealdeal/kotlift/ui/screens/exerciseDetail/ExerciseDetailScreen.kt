@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.ui.composables.cards.ExerciseDetailTags
-import com.therealdeal.kotlift.ui.composables.cards.ExerciseInfoCardRow
+import com.therealdeal.kotlift.ui.composables.cards.ExerciseMuscleCardRow
 import com.therealdeal.kotlift.ui.composables.cards.ExerciseNotesCard
 import com.therealdeal.kotlift.ui.composables.headers.ExerciseDetailHeader
 import com.therealdeal.kotlift.navigation.ExerciseDetailNavigation
@@ -54,7 +54,7 @@ fun ExerciseDetailScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            ExerciseInfoCardRow(
+            ExerciseMuscleCardRow(
                 primaryTarget = "Petto",
                 secondaryTarget = "Tricipiti, Spalle"
             )

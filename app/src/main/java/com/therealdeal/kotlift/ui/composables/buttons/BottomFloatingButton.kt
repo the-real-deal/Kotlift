@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BottomButton(
+fun BottomFloatingButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
