@@ -20,6 +20,7 @@ navigationCompose = "2.9.8"
 storageKt = "3.6.0"
 
 [libraries]
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core-ktx-v1180 = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-viewmodel-compose-android = { module = "androidx.lifecycle:lifecycle-viewmodel-compose-android", version.ref = "lifecycleViewmodelComposeAndroid" }

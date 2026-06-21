@@ -2,7 +2,9 @@ package com.therealdeal.kotlift.ui.composables.headers
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -53,9 +55,9 @@ fun WorkoutDetailHeader(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                GenericChip(icon = Icons.Outlined.Face, text = duration)
-                GenericChip(icon = Icons.Outlined.Face, text = calories)
-                GenericChip(icon = Icons.Outlined.Face, text = level)
+                GenericChip(icon = Icons.Outlined.Timer, text = duration)
+                GenericChip(icon = Icons.Outlined.LocalFireDepartment, text = calories)
+                GenericChip(icon = Icons.Outlined.BarChart, text = level)
             }
         }
     }

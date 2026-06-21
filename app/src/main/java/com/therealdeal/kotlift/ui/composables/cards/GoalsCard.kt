@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-//import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DividerDefaults
@@ -41,13 +41,13 @@ fun GoalsCard() {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            GoalItem(Icons.Default.Face, "Fitness Goal", "Weight Loss", MaterialTheme.colorScheme.onSurface)
+            GoalItem(Icons.Default.TrackChanges, "Fitness Goal", "Weight Loss", MaterialTheme.colorScheme.onSurface)
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 12.dp),
                 thickness = DividerDefaults.Thickness,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
             )
-            GoalItem(Icons.Default.Face, "Preferred Workout", "Home", MaterialTheme.colorScheme.onBackground)
+            GoalItem(Icons.Default.FitnessCenter, "Preferred Workout", "Home", MaterialTheme.colorScheme.onBackground)
         }
     }
 }

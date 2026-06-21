@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Bolt
 //import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,7 +41,7 @@ fun QuickStartCard(title : String, subtitle : String, onClick : () -> Unit) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.AccountBox, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                    Icon(Icons.Filled.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                     Text("Quick Start", color = MaterialTheme.colorScheme.onPrimary)
                 }
                 Text(
