@@ -22,6 +22,8 @@ class AuthRepository(
     private val client: SupabaseClient
 ) {
 
+    // Developer credentials:
+    // username: developer, email dev@developer.com, password: develop123
     suspend fun login(email: String, password: String): Result<Profile> = runCatching {
         Log.d("AUTH", "Logging in as: $email")
 
@@ -47,14 +49,15 @@ class AuthRepository(
 
         return try {
             val response = client.postgrest["profiles"]
-                .select(Columns.raw("id, updated_at, profile_picture, day_streak, total_sessions, unlocked_achievements_count")) {
+                .select(Columns.raw("id, updated_at, profile_picture, day_streak, total_sessions, unlocked_achievements_count, username")) {
                     filter { eq("id", uid) }
                 }
+            Log.i("AUTH", "Response: ${response.data}")
 
             val profileDto = response.decodeSingleOrNull<ProfileDTO>()
                 ?: error("Profile not found in database!")
 
-            profileDto.toDomain(user.email, user.userMetadata?.get("username")?.jsonPrimitive?.content)
+            profileDto.toDomain(user.email)
 
         } catch (e: Exception) {
             Log.e("AUTH", "Error fetching user profile: ${e.message}")
@@ -68,10 +71,8 @@ class AuthRepository(
         password: String
     ): Result<Unit> = runCatching {
 
-        // Create the meta-data object to attach to the user creation
         val signUpMetadata = buildJsonObject {
             put("username", username)
-            // You can add other registration defaults here if needed
         }
 
         // Sign up via Supabase Auth

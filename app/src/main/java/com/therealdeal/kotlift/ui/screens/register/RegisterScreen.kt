@@ -1,5 +1,7 @@
 package com.therealdeal.kotlift.ui.screens.register
 
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import com.therealdeal.kotlift.ui.composables.headers.AuthHeader
 import com.therealdeal.kotlift.ui.composables.login.AppTextField
 import com.therealdeal.kotlift.ui.composables.login.AuthButton
@@ -7,101 +9,130 @@ import com.therealdeal.kotlift.ui.composables.login.ClickableFooterText
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.therealdeal.kotlift.navigation.RegisterNavigation
+import com.therealdeal.kotlift.ui.composables.login.ErrorSnackBarHost
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RegisterScreen(
+    viewModel: RegisterViewModel = koinViewModel(),
     onNavigate: (RegisterNavigation) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val ctx = LocalContext.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+    LaunchedEffect(uiState.isSuccess) {
+        if(uiState.isSuccess) {
+            Toast.makeText(ctx, "Registration complete!", Toast.LENGTH_SHORT).show()
+            onNavigate(RegisterNavigation.Home)
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackBarHostState.showSnackbar(it)
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { ErrorSnackBarHost(hostState = snackBarHostState) }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
         ) {
-            AuthHeader(
-                title = "Start Lifting Smarter",
-                subtitle = "Create your free Kotlift account"
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                AuthHeader(
+                    title = "Start Lifting Smarter",
+                    subtitle = "Create your free Kotlift account"
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            AppTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = "Username",
-                leadingIcon = Icons.Filled.Person,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
+                AppTextField(
+                    value = uiState.username,
+                    onValueChange = viewModel::onUsernameChange,
+                    label = "Username",
+                    leadingIcon = Icons.Filled.Person,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
 
-            AppTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = "Email",
-                leadingIcon = Icons.Filled.Email,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
+                AppTextField(
+                    value = uiState.email,
+                    onValueChange = viewModel::onEmailChange,
+                    label = "Email",
+                    leadingIcon = Icons.Filled.Email,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                )
 
-            AppTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = "Password",
-                leadingIcon = Icons.Filled.Lock,
-                isPassword = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
+                AppTextField(
+                    value = uiState.password,
+                    onValueChange = viewModel::onPasswordChange,
+                    label = "Password",
+                    leadingIcon = Icons.Filled.Lock,
+                    isPassword = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                )
 
-            AppTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                label = "Confirm password",
-                leadingIcon = Icons.Filled.Lock,
-                isPassword = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
+                AppTextField(
+                    value = uiState.confirmPassword,
+                    onValueChange = viewModel::onPasswordConfirmChange,
+                    label = "Confirm password",
+                    leadingIcon = Icons.Filled.Lock,
+                    isPassword = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            if (!uiState.isLoading) viewModel.register()
+                        }
+                    )
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            val isFormValid = name.isNotBlank() &&
-                    email.isNotBlank() &&
-                    password.isNotBlank() &&
-                    password == confirmPassword
+                AuthButton(
+                    text = "Register",
+                    onClick = viewModel::register
+                )
 
-            AuthButton(
-                text = "Register",
-                onClick = { onNavigate(RegisterNavigation.Home) },
-                enabled = isFormValid
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ClickableFooterText(
-                normalText = "Hai già un account?",
-                clickableText = "Login",
-                onClick = {onNavigate(RegisterNavigation.Login)}
-            )
+                ClickableFooterText(
+                    normalText = "Already have an account?",
+                    clickableText = "Login",
+                    onClick = { onNavigate(RegisterNavigation.Login) }
+                )
+            }
         }
     }
 }
