@@ -43,7 +43,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
         ) {
             // --- LOGIN SCREEN ---
             slideComposable<Route.Login> {
-                LoginScreen({nav -> when(nav) {
+                LoginScreen(onNavigate = {nav -> when(nav) {
                     LoginNavigation.Home -> navigateAndClear(
                         navController,
                         targetRoute = Route.Home

@@ -42,8 +42,8 @@ fun RegisterScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             AuthHeader(
-                title = "Inizia Ora",
-                subtitle = "Crea un account Kotlift gratuito"
+                title = "Start Lifting Smarter",
+                subtitle = "Create your free Kotlift account"
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -51,7 +51,7 @@ fun RegisterScreen(
             AppTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = "Nome Completo",
+                label = "Username",
                 leadingIcon = Icons.Filled.Person,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
@@ -76,7 +76,7 @@ fun RegisterScreen(
             AppTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = "Conferma Password",
+                label = "Confirm password",
                 leadingIcon = Icons.Filled.Lock,
                 isPassword = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
@@ -90,7 +90,7 @@ fun RegisterScreen(
                     password == confirmPassword
 
             AuthButton(
-                text = "Registrati",
+                text = "Register",
                 onClick = { onNavigate(RegisterNavigation.Home) },
                 enabled = isFormValid
             )
@@ -99,7 +99,7 @@ fun RegisterScreen(
 
             ClickableFooterText(
                 normalText = "Hai già un account?",
-                clickableText = "Accedi",
+                clickableText = "Login",
                 onClick = {onNavigate(RegisterNavigation.Login)}
             )
         }

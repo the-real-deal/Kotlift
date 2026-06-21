@@ -1,6 +1,7 @@
 package com.therealdeal.kotlift.ui.composables.login
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.therealdeal.kotlift.ui.theme.AppGreen
 import com.therealdeal.kotlift.ui.theme.SurfaceDark
 import com.therealdeal.kotlift.ui.theme.SurfaceVariantDark
@@ -33,9 +35,11 @@ fun AppTextField(
     leadingIcon: ImageVector,
     modifier: Modifier = Modifier,
     isPassword: Boolean = false,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    isError: Boolean = false
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     OutlinedTextField(
         value = value,
@@ -52,7 +56,9 @@ fun AppTextField(
         } else null,
         visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         singleLine = true,
+        isError = isError,
         modifier = modifier.fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = TextPrimary,
