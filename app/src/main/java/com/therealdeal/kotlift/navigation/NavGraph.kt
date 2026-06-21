@@ -26,9 +26,10 @@ fun navigateOnStack(navController: NavHostController, targetRoute: Route) {
 
 fun navigateAndClear(navController: NavHostController, targetRoute: Route) {
     navController.navigate(targetRoute) {
-//        NavOptionsBuilder.popUpTo(Route.Home) {
-//            PopUpToBuilder.saveState = true
-//        }
+        popUpTo(Route.Home) { // navController.graph.findStartDestination().id [TODO]
+            inclusive = true
+            saveState = true
+        }
         launchSingleTop = true
         restoreState = true
     }
@@ -41,7 +42,6 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
             navController = navController,
             startDestination = Route.Login
         ) {
-            // --- LOGIN SCREEN ---
             slideComposable<Route.Login> {
                 LoginScreen(onNavigate = {nav -> when(nav) {
                     LoginNavigation.Home -> navigateAndClear(
@@ -54,20 +54,21 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                     )
                 } })
             }
-            // --- REGISTER SCREEN ---
             slideComposable<Route.Register> {
-                RegisterScreen({nav -> when(nav) {
-                    RegisterNavigation.Home -> navigateAndClear(
-                        navController,
-                        targetRoute = Route.Home
-                    )
-                    RegisterNavigation.Login -> navigateAndClear(
-                        navController,
-                        targetRoute = Route.Login
-                    )
-                } })
+                RegisterScreen { nav ->
+                    when (nav) {
+                        RegisterNavigation.Home -> navigateAndClear(
+                            navController,
+                            targetRoute = Route.Home
+                        )
+
+                        RegisterNavigation.Login -> navigateAndClear(
+                            navController,
+                            targetRoute = Route.Login
+                        )
+                    }
+                }
             }
-            // --- HOME SCREEN ---
             slideComposable<Route.Home> {
                 HomeScreen({ nav ->
                     when (nav) {
@@ -98,10 +99,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 }, innerPadding)
             }
 
-            // --- WORKOUTS SCREEN ---
             slideComposable<Route.Workouts> {
-
-
                 WorkoutsScreen(
                     onNavigate = { nav ->
                         when (nav) {
@@ -115,9 +113,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 )
             }
 
-// --- WORKOUT DETAIL SCREEN ---
             slideComposable<Route.WorkoutDetail> {
-
                 WorkoutDetailScreen(
                     onNavigate = { nav ->
                         when (nav) {
@@ -136,7 +132,6 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 )
             }
 
-            // --- EXERCISES SCREEN (DATABASE) ---
             slideComposable<Route.Exercises> {
                 ExercisesScreen(
                     { nav ->
@@ -152,7 +147,6 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 )
             }
 
-            // --- EXERCISE DETAIL SCREEN ---
             slideComposable<Route.ExerciseDetail> {
                 ExerciseDetailScreen(
                     { nav ->
@@ -164,7 +158,6 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 )
             }
 
-            // --- ACTIVE WORKOUT SCREEN ---
             slideComposable<Route.ActiveWorkout> {
                 ActiveWorkoutScreen({ nav ->
                     when (nav) {
@@ -173,7 +166,6 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 }, innerPadding)
             }
 
-            // --- ALTRI SCHERMI DI BASE ---
             slideComposable<Route.Stats> {
                 StatsScreen({}, innerPadding)
             }
