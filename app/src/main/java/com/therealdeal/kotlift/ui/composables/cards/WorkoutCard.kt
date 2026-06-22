@@ -22,8 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.data.remote.WorkoutDTO
 import com.therealdeal.kotlift.model.Workout
+import com.therealdeal.kotlift.model.WorkoutDifficulty
 import com.therealdeal.kotlift.ui.composables.chips.ChipSize
 import com.therealdeal.kotlift.ui.composables.chips.GenericChip
+import com.therealdeal.kotlift.ui.theme.IconYellow
 
 @Composable
 fun WorkoutCard(
@@ -53,11 +55,16 @@ fun WorkoutCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                val chipColor = when (workout.difficulty) {
+                    WorkoutDifficulty.Beginner -> MaterialTheme.colorScheme.primary
+                    WorkoutDifficulty.Intermediate -> IconYellow
+                    WorkoutDifficulty.Advanced -> MaterialTheme.colorScheme.error
+                }
                 GenericChip(
                     text = workout.difficulty.toString() ?: "Intermediate",
                     size = ChipSize.Small,
-                    backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                    textColor = MaterialTheme.colorScheme.primary
+                    backgroundColor = chipColor.copy(alpha = 0.2f),
+                    textColor = chipColor
                 )
 
                 val durationText =  workout.estimatedTimeMinutes.toString() + " min"

@@ -49,7 +49,8 @@ fun WeeklyActivity(
         labelProperties = LabelProperties(
             enabled = true,
             textStyle = TextStyle(MaterialTheme.colorScheme.onBackground),
-            labels = data.map { (date, _) -> dayLabels[date.dayOfWeek.ordinal] }
+            labels = data.map { (date, _) -> dayLabels[date.dayOfWeek.ordinal] },
+            rotation = LabelProperties.Rotation(degree = 0.0F)
         ),
         indicatorProperties = HorizontalIndicatorProperties(enabled = false),
         gridProperties = GridProperties(enabled = false)

@@ -22,6 +22,7 @@ class MainApplication : Application(), ImageLoaderFactory {
         }
     }
 
+    // only for coil
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
             .components {

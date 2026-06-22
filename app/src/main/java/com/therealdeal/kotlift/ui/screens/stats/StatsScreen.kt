@@ -143,7 +143,7 @@ private fun StatsContent(
                 fontSize = 18.sp
             )
             WeeklyActivity(
-                data = stats.last7DaysActivity,
+                data = stats.last7DaysActivity.map { (a, b) -> Pair(a, b * 60) },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = 16.dp)
