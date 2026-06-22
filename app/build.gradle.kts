@@ -117,4 +117,8 @@ dependencies {
 
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
+
+    // Gif
+    implementation(libs.coil.kt.coil.compose) // O la versione di Coil che stai usando
+    implementation(libs.coil.kt.coil.gif)     // Questa serve specificamente per le GIF
 }

@@ -4,6 +4,7 @@ import com.therealdeal.kotlift.ui.screens.home.HomeViewModel
 import com.therealdeal.kotlift.ui.screens.login.LoginViewModel
 import com.therealdeal.kotlift.ui.screens.register.RegisterViewModel
 import com.therealdeal.kotlift.ui.screens.stats.StatsViewModel
+import com.therealdeal.kotlift.ui.screens.workoutDetail.WorkoutDetailViewModel
 import com.therealdeal.kotlift.ui.screens.workouts.WorkoutsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -15,4 +16,5 @@ val appModule = module {
     viewModel { WorkoutsViewModel(get()) }
     viewModel { HomeViewModel(get(), get()) }
     viewModel { StatsViewModel(get()) }
+    viewModel { WorkoutDetailViewModel(get(), get()) }
 }

@@ -13,14 +13,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.ui.composables.buttons.HeaderBackButton
+import com.therealdeal.kotlift.ui.composables.chips.ChipSize
 import com.therealdeal.kotlift.ui.composables.chips.GenericChip
 
 @Composable
 fun WorkoutDetailHeader(
     title: String,
     duration: String,
-    calories: String,
-    level: String,
+    difficulty: String,
+    createdAt: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -56,8 +57,8 @@ fun WorkoutDetailHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 GenericChip(icon = Icons.Outlined.Timer, text = duration)
-                GenericChip(icon = Icons.Outlined.LocalFireDepartment, text = calories)
-                GenericChip(icon = Icons.Outlined.BarChart, text = level)
+                GenericChip(icon = Icons.Outlined.BarChart, text = difficulty)
+                GenericChip( text = createdAt, size = ChipSize.Small)
             }
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.toRoute
 import com.therealdeal.kotlift.ui.screens.activeWorkout.ActiveWorkoutScreen
 import com.therealdeal.kotlift.ui.screens.createWorkout.CreateWorkoutScreen
 import com.therealdeal.kotlift.ui.screens.exerciseDetail.ExerciseDetailScreen
@@ -110,15 +111,18 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 )
             }
 
-            slideComposable<Route.WorkoutDetail> {
+            slideComposable<Route.WorkoutDetail> { backStack ->
+                val route = backStack.toRoute<Route.WorkoutDetail>()
                 WorkoutDetailScreen(
+                    workoutId = route.workoutId,
                     onNavigate = { nav ->
                         when (nav) {
                             WorkoutDetailNavigation.Back -> navController.popBackStack()
                             is WorkoutDetailNavigation.ExerciseDetail -> navigateOnStack(
                                 navController,
-                                targetRoute = Route.ExerciseDetail(nav.id)
+                                targetRoute = nav.route!!
                             )
+
                             WorkoutDetailNavigation.ActiveWorkout -> navigateOnStack(
                                 navController,
                                 targetRoute = Route.ActiveWorkout
