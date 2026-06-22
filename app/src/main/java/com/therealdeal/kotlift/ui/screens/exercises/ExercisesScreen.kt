@@ -55,7 +55,7 @@ fun ExercisesScreen(
                     category = if (index % 2 == 0) "Corpo Libero" else "Con Pesi",
                     target = "Target: Petto",
                     imageUrl = "https://i.makeagif.com/media/7-17-2021/63CZzt.gif",
-                    onClick = {onNavigate(ExercisesNavigation.ExerciseDetail)}
+                    onClick = {onNavigate(ExercisesNavigation.ExerciseDetail(0))}
                 )
             }
         }

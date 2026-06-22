@@ -91,7 +91,7 @@ fun WorkoutDetailScreen(
                         ModernExerciseCard(
                             title = "sedere", // Riferimento corretto all'oggetto ExerciseWithDetails (.name)
                             subtitle = subtitleText,
-                            onClick = { onNavigate(WorkoutDetailNavigation.ExerciseDetail) }
+                            onClick = { onNavigate(WorkoutDetailNavigation.ExerciseDetail(0)) }
                         )
                     }
                 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.therealdeal.kotlift.ui.screens.activeWorkout.ActiveWorkoutScreen
@@ -68,7 +67,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 }
             }
             slideComposable<Route.Home> {
-                HomeScreen({ nav ->
+                HomeScreen(onNavigate = { nav ->
                     when (nav) {
                         HomeNavigation.Workouts -> navigateAndClear(
                             navController,
@@ -84,9 +83,9 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                             targetRoute = Route.Exercises
                         )
 
-                        HomeNavigation.WorkoutDetail -> navigateOnStack(
+                        is HomeNavigation.WorkoutDetail -> navigateOnStack(
                             navController,
-                            targetRoute = Route.WorkoutDetail
+                            targetRoute = Route.WorkoutDetail(workoutId = nav.id)
                         )
 
                         HomeNavigation.CreateWorkout -> navigateOnStack(
@@ -94,7 +93,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                             targetRoute = Route.CreateWorkout
                         )
                     }
-                }, innerPadding)
+                }, innerPadding = innerPadding)
             }
 
             slideComposable<Route.Workouts> {
@@ -107,7 +106,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                             )
                         }
                     },
-                    innerPadding = innerPadding
+                    innerPadding = innerPadding,
                 )
             }
 
@@ -116,9 +115,9 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                     onNavigate = { nav ->
                         when (nav) {
                             WorkoutDetailNavigation.Back -> navController.popBackStack()
-                            WorkoutDetailNavigation.ExerciseDetail -> navigateOnStack(
+                            is WorkoutDetailNavigation.ExerciseDetail -> navigateOnStack(
                                 navController,
-                                targetRoute = Route.Exercises
+                                targetRoute = Route.ExerciseDetail(nav.id)
                             )
                             WorkoutDetailNavigation.ActiveWorkout -> navigateOnStack(
                                 navController,
@@ -135,9 +134,9 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                     { nav ->
                         when (nav) {
                             ExercisesNavigation.Back -> navController.popBackStack()
-                            ExercisesNavigation.ExerciseDetail -> navigateOnStack(
+                            is ExercisesNavigation.ExerciseDetail -> navigateOnStack(
                                 navController,
-                                targetRoute = Route.ExerciseDetail
+                                targetRoute = Route.ExerciseDetail(nav.id)
                             )
                         }
                     },
@@ -160,12 +159,12 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 ActiveWorkoutScreen({ nav ->
                     when (nav) {
                         ActiveWorkoutNavigation.Back -> navController.popBackStack()
-                    }
+                    } 
                 }, innerPadding)
             }
 
             slideComposable<Route.Stats> {
-                StatsScreen({}, innerPadding)
+                StatsScreen(innerPadding = innerPadding)
             }
 
             slideComposable<Route.Profile> {

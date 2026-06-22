@@ -14,14 +14,15 @@ class WorkoutRepository(
     private val supabase: SupabaseClient
 ) {
 
-    suspend fun getMyWorkouts(): Result<List<WorkoutDTO>> {
+    suspend fun getMyWorkouts(): Result<List<Workout>> {
         return runCatching {
             val currentUserId = supabase.auth.currentUserOrNull()?.id
-                ?: error("User must be authenticated")
+                ?: error("User not authenticated")
 
             supabase.postgrest["workouts"]
                 .select(
                     columns = Columns.list(
+                        "id",
                         "name",
                         "description",
                         "difficulty",
@@ -34,21 +35,18 @@ class WorkoutRepository(
                     order("created_at", Order.DESCENDING)
                 }
                 .decodeList<WorkoutDTO>()
+                .map { it.toDomain() }
         }
     }
 
-    /**
-     * Versione Flow di getMyWorkouts — utile per osservare aggiornamenti
-     * in tempo reale nella UI (es. con collectAsStateWithLifecycle).
-     */
-    fun getMyWorkoutsFlow(): Flow<Result<List<WorkoutDTO>>> = flow {
+    fun getMyWorkoutsFlow(): Flow<Result<List<Workout>>> = flow {
         emit(getMyWorkouts())
     }
 
     suspend fun getWorkoutById(workoutId: String): Result<Workout> {
         return runCatching {
             val currentUserId = supabase.auth.currentUserOrNull()?.id
-                ?: error("User must be authenticated")
+                ?: error("User not authenticated")
 
             supabase.postgrest["workouts"]
                 .select {
@@ -58,7 +56,8 @@ class WorkoutRepository(
                     }
                     limit(1)
                 }
-                .decodeSingle<Workout>()
+                .decodeSingle<WorkoutDTO>()
+                .toDomain()
         }
     }
 
@@ -70,7 +69,7 @@ class WorkoutRepository(
     ): Result<Workout> {
         return runCatching {
             val currentUserId = supabase.auth.currentUserOrNull()?.id
-                ?: error("User must be authenticated")
+                ?: error("User not authenticated")
 
             val newWorkout = mapOf(
                 "creator_id" to currentUserId,
@@ -81,17 +80,46 @@ class WorkoutRepository(
             ).filterValues { it != null }
 
             supabase.postgrest["workouts"]
-                .insert(newWorkout) {
+                .insert(newWorkout) { select() }
+                .decodeSingle<WorkoutDTO>()
+                .toDomain()
+        }
+    }
+
+    suspend fun updateWorkout(
+        workoutId: String,
+        name: String? = null,
+        description: String? = null,
+        difficulty: String? = null,
+        estimatedTimeMinutes: Int? = null
+    ): Result<Workout> {
+        return runCatching {
+            supabase.auth.currentUserOrNull()
+                ?: error("User not authenticated")
+
+            val updates = buildMap {
+                name?.let { put("name", it) }
+                description?.let { put("description", it) }
+                difficulty?.let { put("difficulty", it) }
+                estimatedTimeMinutes?.let { put("estimated_time_minutes", it) }
+            }
+
+            check(updates.isNotEmpty()) { "No fields to update" }
+
+            supabase.postgrest["workouts"]
+                .update(updates) {
+                    filter { eq("id", workoutId) }
                     select()
                 }
-                .decodeSingle<Workout>()
+                .decodeSingle<WorkoutDTO>()
+                .toDomain()
         }
     }
 
     suspend fun deleteWorkout(workoutId: String): Result<Unit> {
         return runCatching {
             supabase.auth.currentUserOrNull()
-                ?: error("User must be authenticated")
+                ?: error("User not authenticated")
 
             supabase.postgrest["workouts"]
                 .delete {

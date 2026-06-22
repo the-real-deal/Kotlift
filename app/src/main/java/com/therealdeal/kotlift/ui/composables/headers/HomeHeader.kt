@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeHeader() {
+fun HomeHeader(username: String?) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -32,7 +32,8 @@ fun HomeHeader() {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column() {
-                Text("Hello, Paolo!", fontSize = 28.sp, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
+                val tmp = username?: "Paolo"
+                Text("Hello, "+tmp+"!", fontSize = 28.sp, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                 Text("Stronger every day!", color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 16.sp)
             }
         }

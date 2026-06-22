@@ -2,27 +2,26 @@ package com.therealdeal.kotlift.ui.screens.workouts
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.therealdeal.kotlift.navigation.WorkoutsNavigation
 import com.therealdeal.kotlift.ui.composables.cards.WorkoutCard
 import com.therealdeal.kotlift.ui.composables.headers.WorkoutsTopBar
-import com.therealdeal.kotlift.ui.composables.chips.FilterRow
-import com.therealdeal.kotlift.ui.theme.Gray
-import com.therealdeal.kotlift.navigation.WorkoutsNavigation
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutsScreen(
+    viewModel: WorkoutsViewModel = koinViewModel(),
     onNavigate: (WorkoutsNavigation) -> Unit,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
 ) {
-    val categories = remember { listOf("Tutti", "beginner", "intermediate", "advanced") }
-
     Scaffold(
         modifier = Modifier.padding(
             top = innerPadding.calculateTopPadding()
@@ -41,54 +40,55 @@ fun WorkoutsScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            val currentCategory = "Tutti"
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+//            FilterRow(
+//                categories = categories,
+//                selectedCategory = currentCategory,
+//                onCategorySelected = {  },
+//                modifier = Modifier.fillMaxWidth()
+//            )
 
-            FilterRow(
-                categories = categories,
-                selectedCategory = currentCategory,
-                onCategorySelected = {  },
-                modifier = Modifier.fillMaxWidth()
-            )
+            when (val state = uiState) {
+                is WorkoutsUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                val state = WorkoutsUiState.Success("chiappe")
-                when (state) {
-//                    is WorkoutsUiState.Loading -> {
-//                        CircularProgressIndicator()
-//                    }
-//
-//                    is WorkoutsUiState.Error -> {
-//                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                            Text(text = state.message, color = MaterialTheme.colorScheme.error)
-//                            Spacer(modifier = Modifier.height(8.dp))
-//                            Button(onClick = { }) {
-//                                Text("Riprova")
-//                            }
-//                        }
-//                    }
+                is WorkoutsUiState.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = state.message)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(onClick = { viewModel.loadWorkouts() }) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                }
 
-                    is WorkoutsUiState.Success -> {
+                is WorkoutsUiState.Success -> {
+                    if (state.workouts.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No workouts created yet")
+                        }
+                    } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            item {
-                                Text(
-                                    text = "Nessun risultato trovato" ,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Gray
-                                )
-                            }
-
-                            items(10) { workout ->
-                                WorkoutCard(
-                                    onClick = { onNavigate(WorkoutsNavigation.WorkoutDetail) }
-                                )
+                            items(state.workouts) { workout ->
+                                WorkoutCard(workout = workout, onClick = {onNavigate(WorkoutsNavigation.WorkoutDetail(workout.id))})
                             }
                         }
                     }

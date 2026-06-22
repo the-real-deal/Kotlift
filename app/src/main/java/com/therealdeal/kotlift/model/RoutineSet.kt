@@ -4,7 +4,7 @@ import java.util.UUID
 
 data class RoutineSet(
     val id: Int = 0,
-    val routineExerciseId: UUID,
+    val routineExerciseId: String,
     val setNumber: Int,
     val targetReps: Int
 )

@@ -7,9 +7,9 @@ sealed interface Route {
     @Serializable data object Register : Route
     @Serializable data object Home : Route
     @Serializable data object Workouts : Route
-    @Serializable data object WorkoutDetail : Route
+    @Serializable data class WorkoutDetail(val workoutId: String) : Route
     @Serializable data object Exercises : Route
-    @Serializable data object ExerciseDetail : Route
+    @Serializable data class ExerciseDetail(val exerciseId: Int) : Route
     @Serializable data object Stats : Route
     @Serializable data object Profile : Route
     @Serializable data object Run : Route
@@ -21,7 +21,7 @@ sealed class HomeNavigation(val route: Route?) {
     object Workouts : HomeNavigation(Route.Workouts)
     object Stats : HomeNavigation(Route.Stats)
     object Exercises : HomeNavigation(Route.Exercises)
-    object WorkoutDetail : HomeNavigation(Route.WorkoutDetail)
+    data class WorkoutDetail(val id: String) : HomeNavigation(Route.WorkoutDetail(id))
     object CreateWorkout : HomeNavigation(Route.CreateWorkout)
 }
 
@@ -34,7 +34,7 @@ sealed class ExerciseDetailNavigation(val route: Route?) {
 }
 
 sealed class ExercisesNavigation(val route: Route?) {
-    object ExerciseDetail : ExercisesNavigation(Route.ExerciseDetail)
+    data class ExerciseDetail(val id: Int) : ExercisesNavigation(Route.ExerciseDetail(id))
     object Back : ExercisesNavigation(null)
 }
 
@@ -49,13 +49,13 @@ sealed class CreateNavigation(val route: Route?) {
 }
 
 sealed class WorkoutDetailNavigation(val route: Route?) {
-    object ExerciseDetail : WorkoutDetailNavigation(Route.ExerciseDetail)
+    data class ExerciseDetail(val id: Int) : WorkoutDetailNavigation(Route.ExerciseDetail(id))
     object ActiveWorkout : WorkoutDetailNavigation(Route.ActiveWorkout)
     object Back : WorkoutDetailNavigation(null)
 }
 
 sealed class WorkoutsNavigation(val route: Route?) {
-    data object WorkoutDetail : WorkoutsNavigation(Route.WorkoutDetail)
+    data class WorkoutDetail(val id: String) : WorkoutsNavigation(Route.WorkoutDetail(id))
 }
 
 sealed class RunNavigation(val route: Route?) {
