@@ -17,11 +17,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.SubcomposeAsyncImage
-import coil.decode.GifDecoder
 import coil.request.ImageRequest
 import com.therealdeal.kotlift.ui.composables.chips.ChipSize
 import com.therealdeal.kotlift.ui.composables.chips.GenericChip
+import org.koin.compose.koinInject
 
 @Composable
 fun ExerciseGridCard(
@@ -33,10 +32,7 @@ fun ExerciseGridCard(
     onClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-
-    val gifImageLoader = ImageLoader.Builder(context)
-        .components { add(GifDecoder.Factory()) }
-        .build()
+    val gifImageLoader: ImageLoader = koinInject()
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -54,7 +50,7 @@ fun ExerciseGridCard(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                SubcomposeAsyncImage(
+                AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(imageUrl)
                         .crossfade(true)
@@ -63,26 +59,8 @@ fun ExerciseGridCard(
                     imageLoader = gifImageLoader,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
-                    loading = {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Default.FitnessCenter,
-                                contentDescription = null,
-                                modifier = Modifier.size(40.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
-                        }
-                    },
-                    error = {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Default.FitnessCenter,
-                                contentDescription = null,
-                                modifier = Modifier.size(40.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
+                    placeholder = rememberVectorPainter(Icons.Default.FitnessCenter),
+                    error = rememberVectorPainter(Icons.Default.FitnessCenter)
                 )
 
                 Box(

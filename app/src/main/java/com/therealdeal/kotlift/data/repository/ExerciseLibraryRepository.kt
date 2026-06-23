@@ -29,6 +29,8 @@ class ExerciseLibraryRepository(
     suspend fun getExercises(
         cursor: String? = null,
         targetMuscle: String? = null,
+        bodyPart: String? = null,
+        equipment: String? = null,
         query: String? = null
     ): Result<ExercisePage> {
         return runCatching {
@@ -36,6 +38,8 @@ class ExerciseLibraryRepository(
                 parameter("limit", PAGE_SIZE)
                 cursor?.let { parameter("after", it) }
                 targetMuscle?.let { parameter("targetMuscles", it) }
+                bodyPart?.let { parameter("bodyParts", it) }
+                equipment?.let { parameter("equipment", it) }
                 query?.takeIf { it.isNotBlank() }?.let { parameter("name", it) }
             }.body<PaginatedResponse<ExerciseDTO>>()
 

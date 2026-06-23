@@ -28,6 +28,7 @@ data class ExercisesUiState(
     val error: String? = null,
     val nextCursor: String? = null
 )
+
 @OptIn(FlowPreview::class)
 class ExercisesViewModel(
     private val exerciseLibraryRepository: ExerciseLibraryRepository
@@ -40,15 +41,14 @@ class ExercisesViewModel(
 
     init {
         loadMuscles()
-        loadExercises()
+        fetchFirstPage()
 
         viewModelScope.launch {
             _searchQuery
                 .debounce(400)
                 .distinctUntilChanged()
                 .collect { query ->
-                    _uiState.update { it.copy(searchQuery = query) }
-                    applyFilters()
+                    fetchFirstPage(searchQuery = query)
                 }
         }
     }
@@ -62,32 +62,41 @@ class ExercisesViewModel(
         }
     }
 
-    fun loadExercises() {
+    private fun fetchFirstPage(
+        filters: ExerciseFilters = _uiState.value.filters,
+        searchQuery: String = _uiState.value.searchQuery
+    ) {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(isLoading = true, error = null, allExercises = emptyList(), filteredExercises = emptyList(), nextCursor = null)
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            exerciseLibraryRepository.getExercises(
+                targetMuscle = filters.targetMuscle,
+                bodyPart = filters.bodyPart,
+                equipment = filters.equipment,
+                query = searchQuery.takeIf { it.isNotBlank() }
+            ).onSuccess { page ->
+                _uiState.update { state ->
+                    val all = page.exercises
+                    state.copy(
+                        allExercises = all,
+                        filteredExercises = all,
+                        hasNextPage = page.hasNextPage,
+                        nextCursor = page.nextCursor,
+                        isLoading = false,
+                        searchQuery = searchQuery,
+                        filters = filters,
+                        bodyParts = all.flatMap { it.bodyParts }.distinct().sorted(),
+                        equipments = all.flatMap { it.equipment }.distinct().sorted()
+                    )
+                }
+            }.onFailure { error ->
+                _uiState.update {
+                    it.copy(isLoading = false, error = error.message ?: "Failed to load exercises")
+                }
             }
-            exerciseLibraryRepository.getExercises()
-                .onSuccess { page ->
-                    val exercises = page.exercises
-                    _uiState.update {
-                        it.copy(
-                            allExercises = exercises,
-                            filteredExercises = exercises,
-                            hasNextPage = page.hasNextPage,
-                            nextCursor = page.nextCursor,
-                            isLoading = false,
-                            bodyParts = exercises.flatMap { e -> e.bodyParts }.distinct().sorted(),
-                            equipments = exercises.flatMap { e -> e.equipment }.distinct().sorted()
-                        )
-                    }
-                    applyFilters()
-                }
-                .onFailure { error ->
-                    _uiState.update { it.copy(isLoading = false, error = error.message ?: "Failed to load exercises") }
-                }
         }
     }
+
+    fun loadExercises() = fetchFirstPage()
 
     fun loadNextPage() {
         val state = _uiState.value
@@ -95,24 +104,30 @@ class ExercisesViewModel(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingMore = true) }
-            exerciseLibraryRepository.getExercises(cursor = state.nextCursor)
-                .onSuccess { page ->
+            exerciseLibraryRepository.getExercises(
+                cursor = state.nextCursor,
+                targetMuscle = state.filters.targetMuscle,
+                bodyPart = state.filters.bodyPart,
+                equipment = state.filters.equipment,
+                query = state.searchQuery.takeIf { it.isNotBlank() }
+            ).onSuccess { page ->
+                _uiState.update { state ->
                     val newAll = state.allExercises + page.exercises
-                    _uiState.update {
-                        it.copy(
-                            allExercises = newAll,
-                            hasNextPage = page.hasNextPage,
-                            nextCursor = page.nextCursor,
-                            isLoadingMore = false,
-                            bodyParts = newAll.flatMap { e -> e.bodyParts }.distinct().sorted(),
-                            equipments = newAll.flatMap { e -> e.equipment }.distinct().sorted()
-                        )
-                    }
-                    applyFilters()
+                    state.copy(
+                        allExercises = newAll,
+                        filteredExercises = newAll,
+                        hasNextPage = page.hasNextPage,
+                        nextCursor = page.nextCursor,
+                        isLoadingMore = false,
+                        bodyParts = newAll.flatMap { it.bodyParts }.distinct().sorted(),
+                        equipments = newAll.flatMap { it.equipment }.distinct().sorted()
+                    )
                 }
-                .onFailure { error ->
-                    _uiState.update { it.copy(isLoadingMore = false, error = error.message ?: "Failed to load more") }
+            }.onFailure { error ->
+                _uiState.update {
+                    it.copy(isLoadingMore = false, error = error.message ?: "Failed to load more")
                 }
+            }
         }
     }
 
@@ -121,21 +136,9 @@ class ExercisesViewModel(
         _searchQuery.value = query
     }
 
-    fun applyFilters(filters: ExerciseFilters = _uiState.value.filters) {
-        _uiState.update { state ->
-            val query = state.searchQuery.trim().lowercase()
-            val filtered = state.allExercises.filter { exercise ->
-                val matchesSearch = query.isEmpty() || exercise.name.lowercase().startsWith(query)
-                val matchesMuscle = filters.targetMuscle == null || exercise.targetMuscles.any { it.equals(filters.targetMuscle, ignoreCase = true) }
-                val matchesBodyPart = filters.bodyPart == null || exercise.bodyParts.any { it.equals(filters.bodyPart, ignoreCase = true) }
-                val matchesEquipment = filters.equipment == null || exercise.equipment.any { it.equals(filters.equipment, ignoreCase = true) }
-                matchesSearch && matchesMuscle && matchesBodyPart && matchesEquipment
-            }
-            state.copy(filters = filters, filteredExercises = filtered)
-        }
+    fun applyFilters(filters: ExerciseFilters) {
+        fetchFirstPage(filters = filters)
     }
 
-    fun clearFilters() {
-        applyFilters(ExerciseFilters())
-    }
+    fun clearFilters() = applyFilters(ExerciseFilters())
 }

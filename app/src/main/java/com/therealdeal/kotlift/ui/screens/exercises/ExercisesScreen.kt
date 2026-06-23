@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,9 +36,10 @@ fun ExercisesScreen(
     val shouldLoadMore by remember {
         derivedStateOf {
             val visibleItems = gridState.layoutInfo.visibleItemsInfo
-            val lastVisible = visibleItems.lastOrNull()?.index ?: 0
+            if (visibleItems.isEmpty()) return@derivedStateOf false
+            val lastVisible = visibleItems.last().index
             val totalItems = gridState.layoutInfo.totalItemsCount
-            totalItems > 0 && visibleItems.isNotEmpty() && lastVisible >= totalItems - 3 && uiState.hasNextPage && !uiState.isLoadingMore
+            lastVisible >= totalItems - 3 && uiState.hasNextPage && !uiState.isLoadingMore
         }
     }
 
@@ -110,7 +109,9 @@ fun ExercisesScreen(
                     if (uiState.isLoadingMore) {
                         item(span = { GridItemSpan(2) }) {
                             Box(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator()
