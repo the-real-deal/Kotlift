@@ -1,7 +1,7 @@
 package com.therealdeal.kotlift.data.remote
 
 import com.therealdeal.kotlift.model.Session
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,14 +17,22 @@ data class SessionDTO(
     @SerialName("actual_duration_minutes")
     val actualDurationMinutes: Int? = null,
     @SerialName("total_weight_lifted")
-    val totalWeightLifted: Double? = null
+    val totalWeightLifted: Double? = null,
+    @SerialName("workouts")
+    val workout: WorkoutTitleDTO? = null
 ) {
-    fun toDomain(): Session = Session(
+        fun toDomain(): Session = Session(
         id = id,
         profileId = profileId,
         workoutId = workoutId,
         startedAt = startedAt,
         actualDurationMinutes = actualDurationMinutes,
-        totalWeightLifted = totalWeightLifted
+        totalWeightLifted = totalWeightLifted,
+        workoutTitle = workout?.name ?: "Unknown Workout"
     )
 }
+
+@Serializable
+data class WorkoutTitleDTO(
+    val name: String
+)

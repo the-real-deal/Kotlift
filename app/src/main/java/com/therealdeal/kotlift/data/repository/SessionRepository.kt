@@ -5,6 +5,7 @@ import com.therealdeal.kotlift.model.Session
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -36,7 +37,15 @@ class SessionRepository(
                 ?: error("User not authenticated")
 
             supabase.postgrest["sessions"]
-                .select {
+                .select(Columns.raw("""
+                    id,
+                    profile_id,
+                    workout_id,
+                    started_at,
+                    actual_duration_minutes,
+                    total_weight_lifted,
+                    workouts(name)
+                    """.trimIndent())) {
                     filter {
                         eq("profile_id", currentUserId)
                     }

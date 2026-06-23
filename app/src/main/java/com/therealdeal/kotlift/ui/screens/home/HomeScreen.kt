@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.therealdeal.kotlift.model.Profile
 import com.therealdeal.kotlift.model.Session
 import com.therealdeal.kotlift.navigation.HomeNavigation
+import com.therealdeal.kotlift.ui.baseAuthentication.AuthenticatedScreen
 import com.therealdeal.kotlift.ui.composables.cards.QuickStartCard
 import com.therealdeal.kotlift.ui.composables.cards.SmallActionCard
 import com.therealdeal.kotlift.ui.composables.cards.StatCard
@@ -39,33 +40,35 @@ fun HomeScreen(
     onNavigate: (HomeNavigation) -> Unit,
     innerPadding: PaddingValues
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    AuthenticatedScreen<HomeViewModel> { viewModel ->
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (val state = uiState) {
-        is HomeUiState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        when (val state = uiState) {
+            is HomeUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-        }
 
-        is HomeUiState.Error -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(state.message)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(onClick = { viewModel.loadHomeData() }) {
-                        Text("Retry")
+            is HomeUiState.Error -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(state.message)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Button(onClick = { viewModel.loadHomeData() }) {
+                            Text("Retry")
+                        }
                     }
                 }
             }
-        }
 
-        is HomeUiState.Success -> {
-            HomeContent(
-                profile = state.profile,
-                latestSessions = state.latestSessions,
-                onNavigate = onNavigate
-            )
+            is HomeUiState.Success -> {
+                HomeContent(
+                    profile = state.profile,
+                    latestSessions = state.latestSessions,
+                    onNavigate = onNavigate
+                )
+            }
         }
     }
 }
@@ -96,7 +99,7 @@ private fun HomeContent(
                 StatCard("Trophy", profile.unlockedAchievementsCount.toString(), Icons.Default.EmojiEvents, IconYellow, Modifier.weight(1f))
             }
 
-            QuickStartCard("Ready to Train?", "Start your workout now", { onNavigate(HomeNavigation.CreateWorkout) })
+            QuickStartCard("Ready to Train?", "Start your workout now") { onNavigate(HomeNavigation.CreateWorkout) }
 
             if (latestSessions.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))

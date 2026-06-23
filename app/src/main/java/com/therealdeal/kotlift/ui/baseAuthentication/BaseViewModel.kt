@@ -51,7 +51,6 @@ abstract class BaseViewModel(
                 null
             }
 
-            // If the user is valid execute the action, logout otherwise
             user?.let { action(it) } ?: logout()
         }
     }

@@ -6,6 +6,7 @@ import com.therealdeal.kotlift.model.Profile
 import com.therealdeal.kotlift.model.Session
 import androidx.lifecycle.viewModelScope
 import com.therealdeal.kotlift.data.repository.SessionRepository
+import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +25,7 @@ sealed interface HomeUiState {
 class HomeViewModel(
     private val authRepository: AuthRepository,
     private val sessionRepository: SessionRepository
-) : ViewModel() {
+) : BaseViewModel(authRepository) {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -34,24 +35,15 @@ class HomeViewModel(
     }
 
     fun loadHomeData() {
-        viewModelScope.launch {
+        withAuth { currentUser ->
             _uiState.value = HomeUiState.Loading
 
-            val profileDeferred = async { authRepository.getCurrentUser() }
-            val sessionsDeferred = async { sessionRepository.getLatestSessions() }
+            val sessionsDeferred =  sessionRepository.getLatestSessions()
 
-            val profile = profileDeferred.await()
-            val sessionsResult = sessionsDeferred.await()
-
-            if (profile == null) {
-                _uiState.value = HomeUiState.Error("Failed to load profile")
-                return@launch
-            }
-
-            sessionsResult
+            sessionsDeferred
                 .onSuccess { sessions ->
                     _uiState.value = HomeUiState.Success(
-                        profile = profile,
+                        profile = currentUser,
                         latestSessions = sessions
                     )
                 }
@@ -59,7 +51,7 @@ class HomeViewModel(
                     _uiState.value = HomeUiState.Error(
                         error.message ?: "Failed to load sessions"
                     )
-                }
+            }
         }
     }
 }
