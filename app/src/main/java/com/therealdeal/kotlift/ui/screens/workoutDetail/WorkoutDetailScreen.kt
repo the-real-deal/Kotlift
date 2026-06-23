@@ -26,10 +26,10 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun WorkoutDetailScreen(
     workoutId: String,
+    viewModel: WorkoutDetailViewModel = koinViewModel(parameters = { parametersOf(workoutId) }),
     onNavigate: (WorkoutDetailNavigation) -> Unit,
     innerPadding: PaddingValues
 ) {
-    val viewModel: WorkoutDetailViewModel = koinViewModel(parameters = { parametersOf(workoutId) })
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Box(

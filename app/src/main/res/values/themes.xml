@@ -4,5 +4,6 @@
         <item name="windowSplashScreenBackground">#000000</item>
         <item name="postSplashScreenTheme">@style/Theme.Kotlift</item>
     </style>
-    <style name="Theme.Kotlift" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Kotlift" parent="android:Theme.Material.Light.NoActionBar"/>
 </resources>

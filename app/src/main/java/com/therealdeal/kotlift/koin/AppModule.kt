@@ -1,5 +1,6 @@
 package com.therealdeal.kotlift.koin
 
+import com.therealdeal.kotlift.ui.screens.exercises.ExercisesViewModel
 import com.therealdeal.kotlift.ui.screens.home.HomeViewModel
 import com.therealdeal.kotlift.ui.screens.login.LoginViewModel
 import com.therealdeal.kotlift.ui.screens.register.RegisterViewModel
@@ -17,4 +18,5 @@ val appModule = module {
     viewModel { HomeViewModel(get(), get()) }
     viewModel { StatsViewModel(get()) }
     viewModel { WorkoutDetailViewModel(get(), get()) }
+    viewModel { ExercisesViewModel(get()) }
 }

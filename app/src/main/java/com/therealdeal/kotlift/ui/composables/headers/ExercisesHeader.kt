@@ -1,15 +1,12 @@
 package com.therealdeal.kotlift.ui.composables.headers
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
@@ -17,17 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.ui.composables.buttons.HeaderBackButton
 import com.therealdeal.kotlift.ui.composables.commonComponents.SearchBar
-import com.therealdeal.kotlift.ui.composables.chips.FilterRow
 
 @Composable
 fun ExercisesHeader(
     searchText: String,
     onSearchChange: (String) -> Unit,
-    muscleGroups: List<String>,
-    selectedMuscle: String,
-    onMuscleSelect: (String) -> Unit,
     onBackClick: () -> Unit,
     onHeightMeasured: (Int) -> Unit,
+    filterBadgeCount: Int,
+    onFilterClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -40,7 +35,7 @@ fun ExercisesHeader(
         Column(
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(top = 14.dp, bottom = 4.dp)
+                .padding(top = 14.dp, bottom = 12.dp)
         ) {
             HeaderBackButton(
                 onClick = onBackClick,
@@ -50,7 +45,7 @@ fun ExercisesHeader(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Database Esercizi",
+                text = "Exercise Library",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = (-0.5).sp,
@@ -60,21 +55,46 @@ fun ExercisesHeader(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            SearchBar(
-                value = searchText,
-                onValueChange = onSearchChange,
-                placeholderText = "Cerca esercizio (es. Piegamenti)...",
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SearchBar(
+                    value = searchText,
+                    onValueChange = onSearchChange,
+                    placeholderText = "Search exercise...",
+                    modifier = Modifier.weight(1f)
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            FilterRow(
-                categories = muscleGroups,
-                selectedCategory = selectedMuscle,
-                onCategorySelected = onMuscleSelect,
-                modifier = Modifier.fillMaxWidth()
-            )
+                BadgedBox(
+                    badge = {
+                        if (filterBadgeCount > 0) {
+                            Badge(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ) {
+                                Text(
+                                    text = filterBadgeCount.toString(),
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    FilledTonalIconButton(
+                        onClick = onFilterClick,
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Tune,
+                            contentDescription = "Filters"
+                        )
+                    }
+                }
+            }
         }
     }
 }
