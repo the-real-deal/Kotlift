@@ -28,19 +28,19 @@ class ExerciseLibraryRepository(
 
     suspend fun getExercises(
         cursor: String? = null,
-        targetMuscle: String? = null,
-        bodyPart: String? = null,
-        equipment: String? = null,
+        targetMuscles: List<String> = emptyList(),
+        bodyParts: List<String> = emptyList(),
+        equipments: List<String> = emptyList(),
         query: String? = null
     ): Result<ExercisePage> {
         return runCatching {
             val response = httpClient.get("$BASE_URL/exercises") {
                 parameter("limit", PAGE_SIZE)
                 cursor?.let { parameter("after", it) }
-                targetMuscle?.let { parameter("targetMuscles", it) }
-                bodyPart?.let { parameter("bodyParts", it) }
-                equipment?.let { parameter("equipment", it) }
                 query?.takeIf { it.isNotBlank() }?.let { parameter("name", it) }
+                targetMuscles.takeIf { it.isNotEmpty() }?.let { parameter("targetMuscles", it.joinToString(",")) }
+                bodyParts.takeIf { it.isNotEmpty() }?.let { parameter("bodyParts", it.joinToString(",")) }
+                equipments.takeIf { it.isNotEmpty() }?.let { parameter("equipments", it.joinToString(",")) }
             }.body<PaginatedResponse<ExerciseDTO>>()
 
             ExercisePage(

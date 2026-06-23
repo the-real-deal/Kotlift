@@ -69,9 +69,9 @@ class ExercisesViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             exerciseLibraryRepository.getExercises(
-                targetMuscle = filters.targetMuscle,
-                bodyPart = filters.bodyPart,
-                equipment = filters.equipment,
+                targetMuscles = listOfNotNull(filters.targetMuscle),
+                bodyParts = listOfNotNull(filters.bodyPart),
+                equipments = listOfNotNull(filters.equipment),
                 query = searchQuery.takeIf { it.isNotBlank() }
             ).onSuccess { page ->
                 _uiState.update { state ->
@@ -106,9 +106,9 @@ class ExercisesViewModel(
             _uiState.update { it.copy(isLoadingMore = true) }
             exerciseLibraryRepository.getExercises(
                 cursor = state.nextCursor,
-                targetMuscle = state.filters.targetMuscle,
-                bodyPart = state.filters.bodyPart,
-                equipment = state.filters.equipment,
+                targetMuscles = listOfNotNull(state.filters.targetMuscle),
+                bodyParts = listOfNotNull(state.filters.bodyPart),
+                equipments = listOfNotNull(state.filters.equipment),
                 query = state.searchQuery.takeIf { it.isNotBlank() }
             ).onSuccess { page ->
                 _uiState.update { state ->
