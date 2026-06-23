@@ -1,7 +1,5 @@
 package com.therealdeal.kotlift.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 data class Session(

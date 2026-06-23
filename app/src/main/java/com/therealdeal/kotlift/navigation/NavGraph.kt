@@ -102,7 +102,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                                 targetRoute = Route.CreateWorkout
                             )
                         }
-                    }, innerPadding = innerPadding)
+                    })
                 }
 
                 slideComposable<Route.Workouts> {

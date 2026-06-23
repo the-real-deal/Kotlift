@@ -1,17 +1,13 @@
 package com.therealdeal.kotlift.ui.screens.home
 
-import androidx.lifecycle.ViewModel
 import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.model.Profile
 import com.therealdeal.kotlift.model.Session
-import androidx.lifecycle.viewModelScope
 import com.therealdeal.kotlift.data.repository.SessionRepository
 import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 sealed interface HomeUiState {
     data object Loading : HomeUiState
@@ -23,7 +19,7 @@ sealed interface HomeUiState {
 }
 
 class HomeViewModel(
-    private val authRepository: AuthRepository,
+    authRepository: AuthRepository,
     private val sessionRepository: SessionRepository
 ) : BaseViewModel(authRepository) {
 

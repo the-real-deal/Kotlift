@@ -36,9 +36,7 @@ import com.therealdeal.kotlift.ui.composables.cards.SessionCard
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = koinViewModel(),
-    onNavigate: (HomeNavigation) -> Unit,
-    innerPadding: PaddingValues
+    onNavigate: (HomeNavigation) -> Unit
 ) {
     AuthenticatedScreen<HomeViewModel> { viewModel ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
