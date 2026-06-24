@@ -13,7 +13,6 @@ class ThemeRepository(
 ) {
     companion object {
         private val THEME_KEY = stringPreferencesKey("theme")
-        private val DYNAMIC_COLOR_KEY = booleanPreferencesKey("dynamicColor")
     }
 
     val theme = dataStore.data.map { preferences ->

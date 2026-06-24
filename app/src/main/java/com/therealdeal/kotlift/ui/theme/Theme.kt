@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.therealdeal.kotlift.ui.theme
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -45,6 +48,7 @@ private val LightColorScheme = lightColorScheme(
     onError = OnErrorWhite
 )
 
+@SuppressLint("ObsoleteSdkInt")
 @Composable
 fun KotliftTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
