@@ -1,6 +1,6 @@
 package com.therealdeal.kotlift.model
 
-data class ExerciseWithDetails(
+data class ExerciseInWorkout(
     val routineExerciseId: String,
     val externalExerciseId: String,
     val orderIndex: Int,

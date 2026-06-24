@@ -159,14 +159,16 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
                     )
                 }
 
-                slideComposable<Route.ExerciseDetail> {
+                slideComposable<Route.ExerciseDetail> {backStack ->
+                    val route = backStack.toRoute<Route.ExerciseDetail>()
                     ExerciseDetailScreen(
-                        { nav ->
+                        onNavigate = { nav ->
                             when (nav) {
                                 ExerciseDetailNavigation.Back -> navController.popBackStack()
                             }
                         },
-                        innerPadding = innerPadding
+                        innerPadding = innerPadding,
+                        exerciseId = route.exerciseId
                     )
                 }
 

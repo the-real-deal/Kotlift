@@ -1,74 +1,106 @@
 package com.therealdeal.kotlift.ui.screens.exerciseDetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.therealdeal.kotlift.navigation.ExerciseDetailNavigation
 import com.therealdeal.kotlift.ui.composables.cards.ExerciseDetailTags
 import com.therealdeal.kotlift.ui.composables.cards.ExerciseMuscleCardRow
-import com.therealdeal.kotlift.ui.composables.cards.ExerciseNotesCard
 import com.therealdeal.kotlift.ui.composables.headers.ExerciseDetailHeader
-import com.therealdeal.kotlift.navigation.ExerciseDetailNavigation
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ExerciseDetailScreen(
+    exerciseId: String,
+    viewModel: ExerciseDetailViewModel = koinViewModel(parameters = { parametersOf(exerciseId) }),
     onNavigate: (ExerciseDetailNavigation) -> Unit,
     innerPadding: PaddingValues
 ) {
-    val scrollState = rememberScrollState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val steps = listOf(
-        "Mettiti in posizione di plank con le mani leggermente più larghe delle spalle.",
-        "Mantieni il corpo in linea retta dai piedi alla testa, contraendo core e glutei.",
-        "Abbassa il corpo piegando i gomiti finché il petto non sfiora il pavimento.",
-        "Spingi via il pavimento per tornare alla posizione di partenza estendendo completamente le braccia."
-    )
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .verticalScroll(scrollState)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        ExerciseDetailHeader(
-            title = "Piegamenti (Push-ups)",
-            onBackClick = { onNavigate(ExerciseDetailNavigation.Back) }
-        )
+        when (val state = uiState) {
+            is ExerciseDetailUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            ExerciseDetailTags(
-                difficulty = "Principiante",
-                category = "Corpo Libero"
-            )
+            is ExerciseDetailUiState.Error -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = { viewModel.loadExerciseDetail() }) {
+                            Text("Retry")
+                        }
+                    }
+                }
+            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            is ExerciseDetailUiState.Success -> {
+                val exercise = state.exercise
 
-            ExerciseMuscleCardRow(
-                primaryTarget = "Petto",
-                secondaryTarget = "Tricipiti, Spalle"
-            )
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = 300.dp,
+                        bottom = innerPadding.calculateBottomPadding() + 16.dp,
+                        start = 4.dp,
+                        end = 4.dp
+                    )
+                ) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            ExerciseDetailTags(
+                                bodyPart = exercise.bodyParts.firstOrNull() ?: "",
+                                equipment = exercise.equipments.firstOrNull() ?: ""
+                            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
 
-            ExerciseInstructionsList(steps = steps)
+                            ExerciseMuscleCardRow(
+                                primaryTarget = exercise.targetMuscles.joinToString(", ")
+                                    .replaceFirstChar { it.uppercase() },
+                                secondaryTarget = exercise.secondaryMuscles.joinToString(", ")
+                                    .replaceFirstChar { it.uppercase() }
+                            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
 
-            ExerciseNotesCard(
-                title = "Errore comune",
-                description = "Evita di far cadere il bacino verso il basso o di alzare troppo i glutei. Mantieni il core solido."
-            )
+                            ExerciseInstructionsList(
+                                steps = exercise.instructions.map { instruction ->
+                                    instruction.replace(Regex("^Step:\\d+\\s*"), "")
+                                }
+                            )
+                        }
+                    }
+                }
+
+                ExerciseDetailHeader(
+                    title = exercise.name.replaceFirstChar { it.uppercase() },
+                    gifUrl = exercise.gifUrl,
+                    onBackClick = { onNavigate(ExerciseDetailNavigation.Back) }
+                )
+            }
         }
     }
 }
@@ -80,7 +112,7 @@ fun ExerciseInstructionsList(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = "Istruzioni",
+            text = "Instructions",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground

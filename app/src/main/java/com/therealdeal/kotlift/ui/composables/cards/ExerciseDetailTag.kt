@@ -10,8 +10,8 @@ import com.therealdeal.kotlift.ui.composables.chips.ChipSize
 import com.therealdeal.kotlift.ui.composables.chips.GenericChip
 @Composable
 fun ExerciseDetailTags(
-    difficulty: String,
-    category: String,
+    bodyPart: String,
+    equipment: String,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -19,14 +19,14 @@ fun ExerciseDetailTags(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         GenericChip(
-            text = difficulty,
+            text = bodyPart,
             size = ChipSize.Medium,
             backgroundColor = MaterialTheme.colorScheme.primaryContainer,
             textColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
         GenericChip(
-            text = category,
+            text = equipment,
             size = ChipSize.Medium,
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             textColor = MaterialTheme.colorScheme.onSurfaceVariant

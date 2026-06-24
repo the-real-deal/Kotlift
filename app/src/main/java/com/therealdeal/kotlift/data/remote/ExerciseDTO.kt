@@ -1,6 +1,7 @@
 package com.therealdeal.kotlift.data.remote
 
 import com.therealdeal.kotlift.model.Exercise
+import com.therealdeal.kotlift.model.ExerciseDetail
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,5 +22,16 @@ data class ExerciseDTO(
         bodyParts = bodyParts,
         targetMuscles = targetMuscles,
         equipment = equipments
+    )
+
+    fun toDomainWithDetail(): ExerciseDetail = ExerciseDetail(
+        exerciseId = exerciseId,
+        name = name,
+        gifUrl = gifUrl,
+        targetMuscles = bodyParts,
+        bodyParts = equipments,
+        equipments = targetMuscles,
+        secondaryMuscles = secondaryMuscles,
+        instructions = instructions
     )
 }

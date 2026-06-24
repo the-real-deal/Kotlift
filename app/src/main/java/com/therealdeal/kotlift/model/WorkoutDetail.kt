@@ -9,6 +9,6 @@ data class WorkoutDetail(
     val difficulty: WorkoutDifficulty?,
     val estimatedTimeMinutes: Int?,
     val createdAt: Instant,
-    val exercises: List<ExerciseWithDetails>
+    val exercises: List<ExerciseInWorkout>
 )
 

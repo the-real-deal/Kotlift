@@ -16,7 +16,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import com.therealdeal.kotlift.data.remote.ExerciseDTO
 import com.therealdeal.kotlift.model.RoutineSet
-import com.therealdeal.kotlift.model.ExerciseWithDetails
+import com.therealdeal.kotlift.model.ExerciseInWorkout
 
 class WorkoutDetailRepository(
     private val supabase: SupabaseClient,
@@ -65,7 +65,7 @@ class WorkoutDetailRepository(
                             ?.map { RoutineSet(setNumber = it.setNumber, targetReps = it.targetReps) }
                             ?: emptyList()
 
-                        ExerciseWithDetails(
+                        ExerciseInWorkout(
                             routineExerciseId = routineExercise.id,
                             externalExerciseId = routineExercise.externalExerciseId,
                             orderIndex = routineExercise.orderIndex,

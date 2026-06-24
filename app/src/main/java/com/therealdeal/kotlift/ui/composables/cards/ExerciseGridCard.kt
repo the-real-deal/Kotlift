@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +20,11 @@ import coil.request.ImageRequest
 import com.therealdeal.kotlift.ui.composables.chips.ChipSize
 import com.therealdeal.kotlift.ui.composables.chips.GenericChip
 import org.koin.compose.koinInject
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun ExerciseGridCard(
@@ -50,18 +54,42 @@ fun ExerciseGridCard(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(imageUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = name,
-                    imageLoader = gifImageLoader,
-                    contentScale = ContentScale.Crop,
+                Box(
                     modifier = Modifier.fillMaxSize(),
-                    placeholder = rememberVectorPainter(Icons.Default.FitnessCenter),
-                    error = rememberVectorPainter(Icons.Default.FitnessCenter)
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    var isError by remember { mutableStateOf(false) }
+                    var isLoading by remember { mutableStateOf(true) }
+
+                    if (isError || imageUrl == null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.White),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FitnessCenter,
+                                contentDescription = null,
+                                tint = Color.Black,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    } else {
+                        AsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(imageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = name,
+                            imageLoader = gifImageLoader,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                            onSuccess = { isLoading = false },
+                            onError = { isError = true }
+                        )
+                    }
+                }
 
                 Box(
                     modifier = Modifier.fillMaxSize(),

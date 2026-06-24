@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.therealdeal.kotlift.data.repository.AchievementsRepository
 import com.therealdeal.kotlift.data.repository.AuthRepository
+import com.therealdeal.kotlift.data.repository.ExerciseDetailRepository
 import com.therealdeal.kotlift.data.repository.ExerciseLibraryRepository
 import com.therealdeal.kotlift.data.repository.SessionRepository
 import com.therealdeal.kotlift.data.repository.StatsRepository
@@ -21,6 +22,7 @@ val dataModule = module{
     single<SessionRepository> { SessionRepository(get()) }
     single<StatsRepository> { StatsRepository(get()) }
     single<WorkoutDetailRepository> { WorkoutDetailRepository(get(), get()) }
+    single<ExerciseDetailRepository> { ExerciseDetailRepository(get()) }
     single<ExerciseLibraryRepository> { ExerciseLibraryRepository(get()) }
     single<AchievementsRepository> { AchievementsRepository(get()) }
     single<ThemeRepository> { ThemeRepository(get()) }

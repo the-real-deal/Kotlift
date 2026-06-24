@@ -36,7 +36,13 @@ fun ExerciseInfoCard(
             Icon(icon, contentDescription = null, tint = AppGreen, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.height(4.dp))
             Text(title, fontSize = 11.sp, color = Gray)
-            Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = value,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                softWrap = true
+            )
         }
     }
 }
