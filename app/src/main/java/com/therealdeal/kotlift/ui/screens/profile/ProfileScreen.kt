@@ -1,5 +1,6 @@
 package com.therealdeal.kotlift.ui.screens.profile
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,18 +14,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ComponentActivity
+import com.therealdeal.kotlift.model.Theme
 import com.therealdeal.kotlift.ui.composables.commonComponents.AchievementsSection
 import com.therealdeal.kotlift.ui.composables.headers.ProfileHeaderSection
 import com.therealdeal.kotlift.ui.composables.settings.SettingsSection
 import com.therealdeal.kotlift.ui.baseAuthentication.AuthenticatedScreen
+import com.therealdeal.kotlift.ui.theme.ThemeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(currentTheme: Theme, onThemeChange: (Theme) -> Unit) {
     AuthenticatedScreen<ProfileViewModel> { viewModel ->
         val uiState by viewModel.uiState.collectAsState()
-
         LaunchedEffect(Unit) { viewModel.loadProfileData() }
 
         if (uiState.isLoading) {
@@ -60,44 +65,29 @@ fun ProfileScreen() {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    SettingsSection()
+                    SettingsSection(currentTheme){ theme ->
+                        onThemeChange(theme)
+                    }
 
                     Spacer(modifier = Modifier.height(40.dp))
 
-                    ProfileActions()
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedButton(
+                            onClick = { viewModel.logout() },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Log Out", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(50.dp))
                 }
             }
         }
 
-    }
-}
-
-
-@Composable
-fun ProfileActions() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        OutlinedButton(
-            onClick = {},
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-        ) {
-            Icon(Icons.Default.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Update Profile", color = MaterialTheme.colorScheme.onSurface)
-        }
-
-        OutlinedButton(
-            onClick = {},
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Log Out & Clear Data", color = MaterialTheme.colorScheme.error)
-        }
     }
 }

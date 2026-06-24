@@ -1,14 +1,24 @@
 package com.therealdeal.kotlift.ui.screens.profile
 
+import androidx.lifecycle.viewModelScope
 import com.therealdeal.kotlift.data.repository.AchievementsRepository
 import com.therealdeal.kotlift.data.repository.AuthRepository
+import com.therealdeal.kotlift.data.repository.ThemeRepository
 import com.therealdeal.kotlift.model.Achievement
 import com.therealdeal.kotlift.model.Profile
+import com.therealdeal.kotlift.model.Theme
 import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
+import com.therealdeal.kotlift.ui.theme.ThemeState
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class ProfileUiState (
     val profile: Profile? = null,

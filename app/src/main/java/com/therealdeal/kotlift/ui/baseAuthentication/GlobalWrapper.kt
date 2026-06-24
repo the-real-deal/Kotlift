@@ -24,7 +24,6 @@ inline fun <reified T : BaseViewModel> AuthenticatedScreen(
     crossinline content: @Composable (T) -> Unit
 ) {
     val onNavigateToLogin = LocalAuthActions.current
-
     val viewModel: T = koinViewModel()
 
     val context = LocalContext.current
@@ -32,7 +31,7 @@ inline fun <reified T : BaseViewModel> AuthenticatedScreen(
     // Listens to eventual logout signals.
     LaunchedEffect(Unit) {
         viewModel.requireLoginEvent.collect {
-            Toast.makeText(context, "Session timed out", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Logged Out", Toast.LENGTH_LONG).show()
             onNavigateToLogin()
         }
     }

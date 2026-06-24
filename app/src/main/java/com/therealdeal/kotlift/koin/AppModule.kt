@@ -10,6 +10,7 @@ import com.therealdeal.kotlift.ui.screens.register.RegisterViewModel
 import com.therealdeal.kotlift.ui.screens.stats.StatsViewModel
 import com.therealdeal.kotlift.ui.screens.workoutDetail.WorkoutDetailViewModel
 import com.therealdeal.kotlift.ui.screens.workouts.WorkoutsViewModel
+import com.therealdeal.kotlift.ui.theme.ThemeViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -29,4 +30,5 @@ val appModule = module {
     viewModel { WorkoutDetailViewModel(get(), get()) }
     viewModel { ExercisesViewModel(get()) }
     viewModel { ProfileViewModel(get(), get()) }
+    viewModel { ThemeViewModel(get()) }
 }

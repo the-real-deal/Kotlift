@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun SettingSwitchItem(icon: ImageVector, label: String, initialValue: Boolean) {
+fun SettingSwitchItem(icon: ImageVector, label: String, initialValue: Boolean, changeTheme:()-> Unit) {
     var checked by remember { mutableStateOf(initialValue) }
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).padding(start = 16.dp),
@@ -43,7 +43,10 @@ fun SettingSwitchItem(icon: ImageVector, label: String, initialValue: Boolean) {
         }
         Switch(
             checked = checked,
-            onCheckedChange = { checked = it },
+            onCheckedChange = {
+                checked = it
+                changeTheme()
+              },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colorScheme.background,
                 checkedTrackColor = MaterialTheme.colorScheme.onSurface,

@@ -57,5 +57,3 @@ fun ProfileHeaderSection(user: Profile?) {
         }
     }
 }
-
-

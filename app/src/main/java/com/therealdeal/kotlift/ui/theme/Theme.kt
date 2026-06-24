@@ -64,9 +64,8 @@ fun KotliftTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            val windowInsetsController = WindowCompat.getInsetsController(window, view)
             window.statusBarColor = colorScheme.background.toArgb()
-            windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.toRoute
+import com.therealdeal.kotlift.model.Theme
 import com.therealdeal.kotlift.ui.baseAuthentication.LocalAuthActions
 import com.therealdeal.kotlift.ui.screens.activeWorkout.ActiveWorkoutScreen
 import com.therealdeal.kotlift.ui.screens.createWorkout.CreateWorkoutScreen
@@ -36,14 +37,16 @@ fun navigateAndClear(navController: NavHostController, targetRoute: Route) {
     }
 }
 @Composable
-fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
+fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, currentTheme: Theme, changeTheme: (theme: Theme) -> Unit) {
     val navigateToLogin = {
         navController.navigate(Route.Login){
             popUpTo(0) { inclusive = true }
         }
     }
+
     Box(Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
-        CompositionLocalProvider(LocalAuthActions provides navigateToLogin){
+        CompositionLocalProvider(LocalAuthActions provides navigateToLogin,
+        ){
             NavHost(
                 navController = navController,
                 startDestination = Route.Login
@@ -180,7 +183,9 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 }
 
                 slideComposable<Route.Profile> {
-                    ProfileScreen()
+                    ProfileScreen(currentTheme) { theme ->
+                        changeTheme(theme)
+                    }
                 }
 
                 slideComposable<Route.Run> {
