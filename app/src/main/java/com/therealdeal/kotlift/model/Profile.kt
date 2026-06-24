@@ -1,8 +1,5 @@
     package com.therealdeal.kotlift.model
 
-    import java.time.Instant
-    import java.util.UUID
-
     data class Profile(
         val id: String,
         val username: String? = null,

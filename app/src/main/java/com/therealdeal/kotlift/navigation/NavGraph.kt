@@ -180,7 +180,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues) {
                 }
 
                 slideComposable<Route.Profile> {
-                    ProfileScreen({}, innerPadding)
+                    ProfileScreen()
                 }
 
                 slideComposable<Route.Run> {

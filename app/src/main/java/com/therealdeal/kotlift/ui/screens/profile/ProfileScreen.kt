@@ -11,41 +11,66 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.therealdeal.kotlift.ui.composables.cards.GoalsCard
 import com.therealdeal.kotlift.ui.composables.commonComponents.AchievementsSection
 import com.therealdeal.kotlift.ui.composables.headers.ProfileHeaderSection
 import com.therealdeal.kotlift.ui.composables.settings.SettingsSection
-import com.therealdeal.kotlift.navigation.ProfileNavigation
+import com.therealdeal.kotlift.ui.baseAuthentication.AuthenticatedScreen
+
 
 @Composable
-fun ProfileScreen(onNavigate: (ProfileNavigation) -> Unit, innerPadding : PaddingValues) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-    ) {
-        ProfileHeaderSection()
+fun ProfileScreen() {
+    AuthenticatedScreen<ProfileViewModel> { viewModel ->
+        val uiState by viewModel.uiState.collectAsState()
 
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            //GoalsCard()
+        LaunchedEffect(Unit) { viewModel.loadProfileData() }
 
-            Spacer(modifier = Modifier.height(20.dp))
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
 
-            AchievementsSection()
-3
-            // Spacer(modifier = Modifier.height(10.dp))
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                ProfileHeaderSection(uiState.profile)
 
-            SettingsSection()
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    //GoalsCard()
 
-            Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-            ProfileActions()
+                    AchievementsSection(achievements = uiState.achievements,
+                        currentProgress = uiState.progress,
+                        isProgressLoading = uiState.isLoadingProgress,
+                        onDismiss = {
+                            viewModel.resetProgress()
+                        }) { achievement ->
+                            viewModel.loadProgress(achievement)
+                    }
 
-            Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    SettingsSection()
+
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    ProfileActions()
+
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
+            }
         }
+
     }
 }
 

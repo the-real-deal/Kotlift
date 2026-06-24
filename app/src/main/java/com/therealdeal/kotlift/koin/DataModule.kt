@@ -1,5 +1,6 @@
 package com.therealdeal.kotlift.koin
 
+import com.therealdeal.kotlift.data.repository.AchievementsRepository
 import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.ExerciseLibraryRepository
 import com.therealdeal.kotlift.data.repository.SessionRepository
@@ -15,4 +16,5 @@ val dataModule = module{
     single<StatsRepository> { StatsRepository(get()) }
     single<WorkoutDetailRepository> { WorkoutDetailRepository(get(), get()) }
     single<ExerciseLibraryRepository> { ExerciseLibraryRepository(get()) }
+    single<AchievementsRepository> { AchievementsRepository(get()) }
 }

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,35 +23,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-// Modello dati per gli achievement
-data class Achievement(
-    val id: String,
-    val name: String,
-    val description: String,
-    val category: String,
-    val xpReward: Int,
-    val isUnlocked: Boolean = false,
-    val unlockedDate: String? = null,
-    val progress: AchievementProgress? = null
-)
-
-data class AchievementProgress(
-    val current: Int,
-    val max: Int
-)
+import com.therealdeal.kotlift.model.Achievement
 
 @Composable
-fun AchievementsSection() {
-    val achievements = listOf(
-        Achievement("first_steps", "First Steps", "Complete your very first workout. Every journey starts with a single rep.", "Beginner", 50, isUnlocked = true, unlockedDate = "12 Jun 2025"),
-        Achievement("on_fire", "On Fire", "Log workouts 7 days in a row. Keep the streak alive!", "Consistency", 150, progress = AchievementProgress(3, 7)),
-        Achievement("dedicated", "Dedicated", "Complete 30 total workouts. Dedication bridges goals and accomplishment.", "Consistency", 300, progress = AchievementProgress(11, 30)),
-        Achievement("record_breaker", "Record Breaker", "Set a new personal record on any exercise.", "Performance", 200),
-        Achievement("self_aware", "Self Aware", "Log your body measurements for the first time.", "Analytics", 100),
-        Achievement("unstoppable", "Unstoppable", "Reach a 30-day workout streak. True legends never stop.", "Mastery", 500, progress = AchievementProgress(3, 30))
-    )
-
+fun AchievementsSection(
+    achievements: List<Achievement>,
+    currentProgress: Int,
+    onDismiss: () -> Unit,
+    isProgressLoading: Boolean,
+    onClick: (achievement: Achievement) -> Unit
+) {
     var selectedAchievement by remember { mutableStateOf<Achievement?>(null) }
 
     Card(
@@ -75,7 +57,7 @@ fun AchievementsSection() {
                     color = MaterialTheme.colorScheme.surfaceContainer,
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    val unlockedCount = achievements.count { it.isUnlocked }
+                    val unlockedCount = achievements.count { it.isCompleted }
                     Text(
                         text = "$unlockedCount / ${achievements.size}",
                         color = MaterialTheme.colorScheme.onSurface,
@@ -107,21 +89,29 @@ fun AchievementsSection() {
     }
 
     selectedAchievement?.let { achievement ->
+        LaunchedEffect(achievement) {
+            onClick(achievement)
+        }
+
         AchievementDetailSheet(
             achievement = achievement,
-            onDismiss = { selectedAchievement = null }
+            progress = currentProgress,
+            isProgressLoading = isProgressLoading,
+            onDismiss = {
+                onDismiss()
+            }
         )
     }
 }
 
 @Composable
 fun BadgeItem(achievement: Achievement, onClick: () -> Unit) {
-    val containerColor = if (achievement.isUnlocked)
+    val containerColor = if (achievement.isCompleted)
         Color(0xFF1D9E75).copy(alpha = 0.15f)
     else
         MaterialTheme.colorScheme.surfaceContainer
 
-    val iconTint = if (achievement.isUnlocked)
+    val iconTint = if (achievement.isCompleted)
         Color(0xFF0F6E56)
     else
         MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
@@ -162,6 +152,8 @@ fun BadgeItem(achievement: Achievement, onClick: () -> Unit) {
 @Composable
 fun AchievementDetailSheet(
     achievement: Achievement,
+    progress: Int,
+    isProgressLoading: Boolean,
     onDismiss: () -> Unit
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
@@ -171,11 +163,10 @@ fun AchievementDetailSheet(
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp)
         ) {
-            // Header: icona + titolo + stato
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(
                     shape = RoundedCornerShape(14.dp),
-                    color = if (achievement.isUnlocked)
+                    color = if (achievement.isCompleted)
                         Color(0xFF1D9E75).copy(alpha = 0.15f)
                     else
                         MaterialTheme.colorScheme.surfaceContainer,
@@ -185,7 +176,7 @@ fun AchievementDetailSheet(
                         Icon(
                             imageVector = Icons.Outlined.EmojiEvents,
                             contentDescription = null,
-                            tint = if (achievement.isUnlocked) Color(0xFF0F6E56)
+                            tint = if (achievement.isCompleted) Color(0xFF0F6E56)
                             else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                             modifier = Modifier.size(30.dp)
                         )
@@ -202,9 +193,9 @@ fun AchievementDetailSheet(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = if (achievement.isUnlocked) "✓ Unlocked" else "Locked",
+                        text = if (achievement.isCompleted) "✓ Unlocked" else "Locked",
                         fontSize = 13.sp,
-                        color = if (achievement.isUnlocked) Color(0xFF0F6E56)
+                        color = if (achievement.isCompleted) Color(0xFF0F6E56)
                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
@@ -221,14 +212,13 @@ fun AchievementDetailSheet(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp))
 
-            DetailRow(label = "Category", value = achievement.category)
-            DetailRow(label = "XP reward", value = "+${achievement.xpReward} XP")
+            DetailRow(label = "Category", value = achievement.name)
 
-            if (achievement.isUnlocked && achievement.unlockedDate != null) {
-                DetailRow(label = "Unlocked on", value = achievement.unlockedDate)
+            if (achievement.isCompleted && achievement.completedAt != null) {
+                DetailRow(label = "Unlocked on", value = achievement.completedAt.toString())
             }
 
-            if (!achievement.isUnlocked && achievement.progress != null) {
+            if (!achievement.isCompleted) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
@@ -237,7 +227,7 @@ fun AchievementDetailSheet(
                 ) {
                     Text(text = "Progress", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     Text(
-                        text = "${achievement.progress.current} / ${achievement.progress.max}",
+                        text = "$progress / ${achievement.threshold}",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -246,8 +236,13 @@ fun AchievementDetailSheet(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
+                var baseProgress = 0.0f
+
+                if(!isProgressLoading) {
+                    baseProgress = progress.toFloat()
+                }
                 val animatedProgress by animateFloatAsState(
-                    targetValue = achievement.progress.current.toFloat() / achievement.progress.max,
+                    targetValue = baseProgress / achievement.threshold,
                     animationSpec = tween(500),
                     label = "progress"
                 )

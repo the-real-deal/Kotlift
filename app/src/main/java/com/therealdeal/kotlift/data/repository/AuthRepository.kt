@@ -8,9 +8,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
-//import io.github.jan.supabase.storage.storage [todo] maybe save images
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 
@@ -43,8 +41,6 @@ class AuthRepository(
     suspend fun getCurrentUser(): Profile? {
         client.auth.awaitInitialization()
         val user = client.auth.currentUserOrNull()
-        Log.i("AUTH", "Current user: '$user'")
-
         val uid = user?.id ?: return null
 
         return try {
@@ -52,7 +48,6 @@ class AuthRepository(
                 .select(Columns.raw("id, updated_at, profile_picture, day_streak, total_sessions, unlocked_achievements_count, username")) {
                     filter { eq("id", uid) }
                 }
-            Log.i("AUTH", "Response: ${response.data}")
 
             val profileDto = response.decodeSingleOrNull<ProfileDTO>()
                 ?: error("Profile not found in database!")

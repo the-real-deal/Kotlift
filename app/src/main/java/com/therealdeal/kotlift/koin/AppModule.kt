@@ -5,6 +5,7 @@ import coil.decode.GifDecoder
 import com.therealdeal.kotlift.ui.screens.exercises.ExercisesViewModel
 import com.therealdeal.kotlift.ui.screens.home.HomeViewModel
 import com.therealdeal.kotlift.ui.screens.login.LoginViewModel
+import com.therealdeal.kotlift.ui.screens.profile.ProfileViewModel
 import com.therealdeal.kotlift.ui.screens.register.RegisterViewModel
 import com.therealdeal.kotlift.ui.screens.stats.StatsViewModel
 import com.therealdeal.kotlift.ui.screens.workoutDetail.WorkoutDetailViewModel
@@ -27,4 +28,5 @@ val appModule = module {
     viewModel { StatsViewModel(get()) }
     viewModel { WorkoutDetailViewModel(get(), get()) }
     viewModel { ExercisesViewModel(get()) }
+    viewModel { ProfileViewModel(get(), get()) }
 }
