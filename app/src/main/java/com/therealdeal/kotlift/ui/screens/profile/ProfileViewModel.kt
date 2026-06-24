@@ -51,6 +51,6 @@ class ProfileViewModel(
     }
 
     fun resetProgress() {
-        _uiState.update { it.copy(progress = -1) }
+        _uiState.update { it.copy(progress = 0) }
     }
 }
