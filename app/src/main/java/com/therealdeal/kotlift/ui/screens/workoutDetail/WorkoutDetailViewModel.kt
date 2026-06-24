@@ -2,12 +2,14 @@ package com.therealdeal.kotlift.ui.screens.workoutDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.WorkoutDetailRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.therealdeal.kotlift.model.WorkoutDetail
+import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
 
 sealed interface WorkoutDetailUiState {
     data object Loading : WorkoutDetailUiState
@@ -16,9 +18,10 @@ sealed interface WorkoutDetailUiState {
 }
 
 class WorkoutDetailViewModel(
+    authRepository: AuthRepository,
     private val workoutDetailRepository: WorkoutDetailRepository,
     private val workoutId: String
-) : ViewModel() {
+): BaseViewModel(authRepository)  {
 
     private val _uiState = MutableStateFlow<WorkoutDetailUiState>(WorkoutDetailUiState.Loading)
     val uiState: StateFlow<WorkoutDetailUiState> = _uiState.asStateFlow()

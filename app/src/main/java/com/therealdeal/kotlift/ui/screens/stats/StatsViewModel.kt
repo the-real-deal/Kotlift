@@ -1,7 +1,9 @@
 package com.therealdeal.kotlift.ui.screens.stats
 
-import androidx.lifecycle.ViewModel
+
+import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
 import androidx.lifecycle.viewModelScope
+import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.StatsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +19,9 @@ sealed interface StatsUiState {
 
 
 class StatsViewModel(
+    authRepository: AuthRepository,
     private val statsRepository: StatsRepository
-) : ViewModel() {
+) : BaseViewModel(authRepository) {
 
     private val _uiState = MutableStateFlow<StatsUiState>(StatsUiState.Loading)
     val uiState: StateFlow<StatsUiState> = _uiState.asStateFlow()

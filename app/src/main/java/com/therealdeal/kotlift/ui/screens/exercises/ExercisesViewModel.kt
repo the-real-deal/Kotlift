@@ -2,9 +2,11 @@ package com.therealdeal.kotlift.ui.screens.exercises
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.ExerciseLibraryRepository
 import com.therealdeal.kotlift.model.Exercise
 import com.therealdeal.kotlift.model.ExerciseFilters
+import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,8 +33,9 @@ data class ExercisesUiState(
 
 @OptIn(FlowPreview::class)
 class ExercisesViewModel(
+    authRepository: AuthRepository,
     private val exerciseLibraryRepository: ExerciseLibraryRepository
-) : ViewModel() {
+) : BaseViewModel(authRepository) {
 
     private val _uiState = MutableStateFlow(ExercisesUiState())
     val uiState: StateFlow<ExercisesUiState> = _uiState.asStateFlow()

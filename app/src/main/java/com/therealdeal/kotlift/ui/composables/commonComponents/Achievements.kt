@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,7 +78,10 @@ fun AchievementsSection(
                         rowItems.forEach { achievement ->
                             BadgeItem(
                                 achievement = achievement,
-                                onClick = { selectedAchievement = achievement }
+                                onClick = {
+                                    selectedAchievement = achievement
+                                    onClick(achievement)
+                                }
                             )
                         }
                     }
@@ -89,15 +91,12 @@ fun AchievementsSection(
     }
 
     selectedAchievement?.let { achievement ->
-        LaunchedEffect(achievement) {
-            onClick(achievement)
-        }
-
         AchievementDetailSheet(
             achievement = achievement,
             progress = currentProgress,
             isProgressLoading = isProgressLoading,
             onDismiss = {
+                selectedAchievement = null
                 onDismiss()
             }
         )
