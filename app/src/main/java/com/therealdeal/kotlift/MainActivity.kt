@@ -10,7 +10,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,10 +21,8 @@ import com.therealdeal.kotlift.ui.composables.commonComponents.AppBottomNavBar
 import com.therealdeal.kotlift.ui.theme.KotliftTheme
 import com.therealdeal.kotlift.navigation.NavGraph
 import com.therealdeal.kotlift.navigation.Route
-import com.therealdeal.kotlift.ui.screens.profile.ProfileViewModel
 import com.therealdeal.kotlift.ui.theme.ThemeViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("RestrictedApi")

@@ -24,15 +24,7 @@ class ThemeRepository(
         }
     }
 
-    val dynamicColor = dataStore.data.map { preferences ->
-        preferences[DYNAMIC_COLOR_KEY] ?: false
-    }
-
     suspend fun setTheme(theme: Theme) = dataStore.edit { preferences ->
         preferences[THEME_KEY] = theme.toString()
-    }
-
-    suspend fun setDynamicColor(enabled: Boolean) = dataStore.edit { preferences ->
-        preferences[DYNAMIC_COLOR_KEY] = enabled
     }
 }

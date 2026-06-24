@@ -1,6 +1,5 @@
 package com.therealdeal.kotlift.ui.screens.profile
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,22 +8,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ComponentActivity
 import com.therealdeal.kotlift.model.Theme
 import com.therealdeal.kotlift.ui.composables.commonComponents.AchievementsSection
 import com.therealdeal.kotlift.ui.composables.headers.ProfileHeaderSection
 import com.therealdeal.kotlift.ui.composables.settings.SettingsSection
 import com.therealdeal.kotlift.ui.baseAuthentication.AuthenticatedScreen
-import com.therealdeal.kotlift.ui.theme.ThemeViewModel
-import org.koin.androidx.compose.koinViewModel
-
 
 @Composable
 fun ProfileScreen(currentTheme: Theme, onThemeChange: (Theme) -> Unit) {
