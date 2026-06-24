@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.therealdeal.kotlift.ui.theme
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -45,6 +48,7 @@ private val LightColorScheme = lightColorScheme(
     onError = OnErrorWhite
 )
 
+@SuppressLint("ObsoleteSdkInt")
 @Composable
 fun KotliftTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -64,9 +68,8 @@ fun KotliftTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            val windowInsetsController = WindowCompat.getInsetsController(window, view)
             window.statusBarColor = colorScheme.background.toArgb()
-            windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

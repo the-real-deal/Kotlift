@@ -23,6 +23,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.model.Achievement
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toLocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AchievementsSection(
@@ -98,6 +102,7 @@ fun AchievementsSection(
             onDismiss = {
                 selectedAchievement = null
                 onDismiss()
+                selectedAchievement = null
             }
         )
     }
@@ -214,7 +219,13 @@ fun AchievementDetailSheet(
             DetailRow(label = "Category", value = achievement.name)
 
             if (achievement.isCompleted && achievement.completedAt != null) {
-                DetailRow(label = "Unlocked on", value = achievement.completedAt.toString())
+                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                val formatted = achievement.completedAt
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+                    .toJavaLocalDate()
+                    .format(formatter)?: "No date"
+                DetailRow(label = "Unlocked on", value = formatted)
             }
 
             if (!achievement.isCompleted) {
