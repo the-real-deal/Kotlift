@@ -13,7 +13,7 @@ sealed interface Route {
     @Serializable data object Stats : Route
     @Serializable data object Profile : Route
     @Serializable data object Run : Route
-    @Serializable data object ActiveWorkout : Route
+    @Serializable data class ActiveWorkout(val workoutId: String) : Route
     @Serializable data object CreateWorkout : Route
 }
 
@@ -51,7 +51,7 @@ sealed class CreateNavigation(val route: Route?) {
 
 sealed class WorkoutDetailNavigation(val route: Route?) {
     data class ExerciseDetail(val id: String) : WorkoutDetailNavigation(Route.ExerciseDetail(id))
-    object ActiveWorkout : WorkoutDetailNavigation(Route.ActiveWorkout)
+    data class ActiveWorkout(val id: String) : WorkoutDetailNavigation(Route.ActiveWorkout(id))
     object Back : WorkoutDetailNavigation(null)
 }
 

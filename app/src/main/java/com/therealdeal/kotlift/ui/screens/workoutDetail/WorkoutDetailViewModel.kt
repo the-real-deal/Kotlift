@@ -1,6 +1,5 @@
 package com.therealdeal.kotlift.ui.screens.workoutDetail
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.WorkoutDetailRepository

@@ -19,6 +19,10 @@ import com.therealdeal.kotlift.ui.composables.cards.WorkoutExerciseCard
 import com.therealdeal.kotlift.ui.composables.buttons.BottomFloatingButton
 import com.therealdeal.kotlift.ui.theme.Gray
 import com.therealdeal.kotlift.navigation.ActiveWorkoutNavigation
+import com.therealdeal.kotlift.navigation.WorkoutDetailNavigation
+import com.therealdeal.kotlift.ui.screens.workoutDetail.WorkoutDetailViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 data class ExerciseSetTemplate(
     val targetReps: Int,
@@ -33,6 +37,8 @@ data class ExerciseData(
 
 @Composable
 fun ActiveWorkoutScreen(
+    workoutId: String,
+    viewModel: WorkoutDetailViewModel = koinViewModel(parameters = { parametersOf(workoutId) }),
     onNavigate: (ActiveWorkoutNavigation) -> Unit,
     innerPadding: PaddingValues
 ) {

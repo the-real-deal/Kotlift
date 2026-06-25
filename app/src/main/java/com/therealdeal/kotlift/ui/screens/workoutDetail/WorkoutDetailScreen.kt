@@ -122,7 +122,7 @@ fun WorkoutDetailScreen(
 
                 BottomFloatingButton(
                     text = "Start",
-                    onClick = { onNavigate(WorkoutDetailNavigation.ActiveWorkout) },
+                    onClick = { onNavigate(WorkoutDetailNavigation.ActiveWorkout(workoutId)) },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 24.dp),

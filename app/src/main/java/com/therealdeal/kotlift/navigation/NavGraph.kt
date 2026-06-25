@@ -125,9 +125,9 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
                                 targetRoute = nav.route!!
                             )
 
-                            WorkoutDetailNavigation.ActiveWorkout -> navigateOnStack(
+                            is WorkoutDetailNavigation.ActiveWorkout -> navigateOnStack(
                                 navController,
-                                targetRoute = Route.ActiveWorkout
+                                targetRoute = nav.route!!
                             )
                         }
                     },
@@ -163,12 +163,14 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
                 )
             }
 
-            slideComposable<Route.ActiveWorkout> {
-                ActiveWorkoutScreen({ nav ->
+            slideComposable<Route.ActiveWorkout> { backStack ->
+                val route = backStack.toRoute<Route.WorkoutDetail>()
+                ActiveWorkoutScreen(workoutId = route.workoutId,
+                    onNavigate = { nav ->
                     when (nav) {
                         ActiveWorkoutNavigation.Back -> navController.popBackStack()
                     }
-                }, innerPadding)
+                }, innerPadding = innerPadding)
             }
 
             slideComposable<Route.Stats> {
