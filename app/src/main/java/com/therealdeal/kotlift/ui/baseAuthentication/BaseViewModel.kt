@@ -1,6 +1,5 @@
 package com.therealdeal.kotlift.ui.baseAuthentication
 
-
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +8,6 @@ import com.therealdeal.kotlift.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 /**
  * Base view model that handles common function for authentication.
@@ -52,25 +50,6 @@ abstract class BaseViewModel(
             }
 
             user?.let { action(it) } ?: logout()
-        }
-    }
-
-    /**
-     * Verifies that the user is authenticated to perform an action.
-     * Does not pass the Profile object to the lambda function.
-     *
-     * @param action Lambda to call to perform the action
-     */
-    protected fun requireAuth(action: suspend () -> Unit) {
-        viewModelScope.launch {
-            val user = try {
-                authRepository.getCurrentUser()
-            } catch (e: Exception) {
-                Log.e("AUTH_CHECK", "Original error: ${e.message}")
-                null
-            }
-
-            user?.let { action() } ?: logout()
         }
     }
 }

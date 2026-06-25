@@ -1,0 +1,72 @@
+package com.therealdeal.kotlift.utils
+
+import android.annotation.SuppressLint
+import android.content.ContentResolver
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.os.SystemClock
+import android.provider.MediaStore
+import android.util.Log
+import java.io.File
+import java.io.FileNotFoundException
+
+@SuppressLint("ObsoleteSdkInt")
+fun uriToBitmap(imageUri: Uri, contentResolver: ContentResolver): Bitmap {
+    val bitmap = when {
+        Build.VERSION.SDK_INT < 28 -> {
+            @Suppress("DEPRECATION")
+            MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+        }
+        else -> {
+            val source = ImageDecoder.createSource(contentResolver, imageUri)
+            ImageDecoder.decodeBitmap(source)
+        }
+    }
+    return bitmap
+}
+
+fun saveImageToStorage(
+    imageUri: Uri,
+    contentResolver: ContentResolver,
+    name: String = "IMG_${SystemClock.uptimeMillis()}"
+): Uri {
+    val bitmap = uriToBitmap(imageUri, contentResolver)
+
+    val values = ContentValues()
+    values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+    values.put(MediaStore.Images.Media.DISPLAY_NAME, name)
+
+    val savedImageUri =
+        contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    val outputStream = savedImageUri?.let { contentResolver.openOutputStream(it) }
+        ?: throw FileNotFoundException()
+
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+    outputStream.close()
+
+    return savedImageUri
+}
+
+fun deleteImageFromStorage(context: Context, uri: Uri) {
+    try {
+        when (uri.scheme) {
+            ContentResolver.SCHEME_CONTENT -> {
+                // Deletes from shared/public storage or FileProvider
+                context.contentResolver.delete(uri, null, null)
+            }
+            ContentResolver.SCHEME_FILE -> {
+                // Deletes from internal app directories (cacheDir, filesDir)
+                val file = File(uri.path ?: return)
+                if (file.exists()) {
+                    file.delete()
+                }
+            }
+        }
+    } catch (e: Exception) {
+        Log.e("ImageUtils", "Failed to delete image: ${e.message}", e)
+    }
+}

@@ -2,7 +2,7 @@ package com.therealdeal.kotlift.ui.theme
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.therealdeal.kotlift.data.repository.ThemeRepository
+import com.therealdeal.kotlift.data.repository.DataStoreRepository
 import com.therealdeal.kotlift.model.Theme
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -14,7 +14,7 @@ data class ThemeState(
 )
 
 class ThemeViewModel(
-    private val repository: ThemeRepository
+    private val repository: DataStoreRepository
 ) : ViewModel() {
 
     val state = repository.theme

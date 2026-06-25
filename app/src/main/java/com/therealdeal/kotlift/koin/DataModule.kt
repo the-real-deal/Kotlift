@@ -8,7 +8,7 @@ import com.therealdeal.kotlift.data.repository.ExerciseDetailRepository
 import com.therealdeal.kotlift.data.repository.ExerciseLibraryRepository
 import com.therealdeal.kotlift.data.repository.SessionRepository
 import com.therealdeal.kotlift.data.repository.StatsRepository
-import com.therealdeal.kotlift.data.repository.ThemeRepository
+import com.therealdeal.kotlift.data.repository.DataStoreRepository
 import com.therealdeal.kotlift.data.repository.WorkoutDetailRepository
 import com.therealdeal.kotlift.data.repository.WorkoutRepository
 import org.koin.dsl.module
@@ -25,5 +25,5 @@ val dataModule = module{
     single<ExerciseDetailRepository> { ExerciseDetailRepository(get()) }
     single<ExerciseLibraryRepository> { ExerciseLibraryRepository(get()) }
     single<AchievementsRepository> { AchievementsRepository(get()) }
-    single<ThemeRepository> { ThemeRepository(get()) }
+    single<DataStoreRepository> { DataStoreRepository(get()) }
 }

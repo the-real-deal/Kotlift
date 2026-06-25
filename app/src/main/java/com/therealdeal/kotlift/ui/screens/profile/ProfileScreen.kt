@@ -51,7 +51,7 @@ fun ProfileScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
         ) {
-            ProfileHeaderSection(uiState.profile)
+            ProfileHeaderSection(uiState.profile, viewModel)
 
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 //GoalsCard()
