@@ -39,6 +39,7 @@ sealed class ExercisesNavigation(val route: Route?) {
 }
 
 sealed class ProfileNavigation(val route: Route?) {
+    object Login: ProfileNavigation(Route.Login)
 }
 
 sealed class StatsNavigation(val route: Route?) {

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.update
 
 data class ProfileUiState (
     val profile: Profile? = null,
-    val isLoading: Boolean = true,
+    val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val achievements: List<Achievement> = emptyList(),
     val progress: Int = 0,
@@ -26,6 +26,10 @@ class ProfileViewModel(
 ) : BaseViewModel(authRepository) {
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+
+    init {
+        loadProfileData()
+    }
 
     fun loadProfileData() {
         withAuth { user ->

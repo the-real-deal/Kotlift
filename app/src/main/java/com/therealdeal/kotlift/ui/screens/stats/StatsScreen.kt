@@ -3,10 +3,10 @@ package com.therealdeal.kotlift.ui.screens.stats
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.therealdeal.kotlift.model.Stats
-import com.therealdeal.kotlift.navigation.StatsNavigation
 import com.therealdeal.kotlift.ui.composables.cards.MiniStatCard
 import com.therealdeal.kotlift.ui.composables.chart.WeeklyActivity
 import com.therealdeal.kotlift.ui.theme.AppGreen
@@ -125,7 +124,7 @@ private fun StatsContent(
                 MiniStatCard(
                     "Top Workout",
                     stats.mostDoneWorkout?.let { "${it.count}x" } ?: "-",
-                    Icons.Default.TrendingUp,
+                    Icons.AutoMirrored.Filled.TrendingUp,
                     AppGreen,
                     Modifier.weight(1f)
                 )
