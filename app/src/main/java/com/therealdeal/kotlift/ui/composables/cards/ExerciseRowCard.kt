@@ -18,11 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale // <--- IMPORTANTE
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage // <--- IMPORTANTE (Assicurati di avere Coil nel progetto)
+import coil.compose.AsyncImage
 import com.therealdeal.kotlift.ui.theme.Gray
 
 @Composable

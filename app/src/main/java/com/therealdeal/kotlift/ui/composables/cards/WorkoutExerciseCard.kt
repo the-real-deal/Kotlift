@@ -4,27 +4,42 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.ui.theme.AppGreen
 import com.therealdeal.kotlift.ui.theme.Gray
 
+data class SetData(
+    val weight: String = "",
+    val reps: String = "",
+    val targetReps: Int,
+    val suggestedWeight: String = "",
+    val isDone: Boolean = false
+)
+
 @Composable
 fun WorkoutExerciseCard(
     exerciseName: String,
     targetMuscles: String,
-    sets: List<String>,
-    completedSets: List<Boolean>,
-    onSetCheckedChange: (Int, Boolean) -> Unit,
+    sets: List<SetData>,
+    onSetChanged: (index: Int, updated: SetData) -> Unit,
+    onAddSet: () -> Unit,
+    onRemoveSet: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -51,24 +66,35 @@ fun WorkoutExerciseCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "SERIE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Gray, modifier = Modifier.weight(1f))
-                Text(text = "DATO", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Gray, modifier = Modifier.weight(2f), textAlign = TextAlign.Center)
-                Text(text = "FATTO", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Gray, modifier = Modifier.weight(1f), textAlign = TextAlign.End)
+                Text(text = "SET",  fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Gray, modifier = Modifier.weight(0.7f))
+                Text(text = "KG",   fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Gray, modifier = Modifier.weight(1.3f), textAlign = TextAlign.Center)
+                Text(text = "REPS", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Gray, modifier = Modifier.weight(1.3f), textAlign = TextAlign.Center)
+                Text(text = "DONE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Gray, modifier = Modifier.weight(1f),   textAlign = TextAlign.End)
             }
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            sets.forEachIndexed { index, setInfo ->
-                val isDone = completedSets.getOrElse(index) { false }
-
+            sets.forEachIndexed { index, set ->
                 WorkoutSetRow(
                     index = index + 1,
-                    setInfo = setInfo,
-                    isDone = isDone,
-                    onCheckedChange = { onSetCheckedChange(index, it) }
+                    set = set,
+                    onWeightChange = { onSetChanged(index, set.copy(weight = it)) },
+                    onRepsChange   = { onSetChanged(index, set.copy(reps = it)) },
+                    onDoneToggle   = {
+                        val resolvedWeight = set.weight.ifBlank { set.suggestedWeight }
+                        val resolvedReps   = set.reps.ifBlank { set.targetReps.toString() }
+                        onSetChanged(index, set.copy(
+                            isDone = !set.isDone,
+                            weight = if (!set.isDone) resolvedWeight else set.weight,
+                            reps   = if (!set.isDone) resolvedReps   else set.reps
+                        ))
+                    }
                 )
 
                 if (index < sets.lastIndex) {
@@ -78,6 +104,41 @@ fun WorkoutExerciseCard(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onRemoveSet,
+                    enabled = sets.size > 1,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Gray,
+                        disabledContentColor = Gray.copy(alpha = 0.3f)
+                    )
+                ) {
+                    Text(text = "− Remove set", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+
+                Button(
+                    onClick = onAddSet,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppGreen.copy(alpha = 0.15f),
+                        contentColor = AppGreen
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(0.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "Add set", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         }
     }
 }
@@ -85,15 +146,24 @@ fun WorkoutExerciseCard(
 @Composable
 private fun WorkoutSetRow(
     index: Int,
-    setInfo: String,
-    isDone: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    set: SetData,
+    onWeightChange: (String) -> Unit,
+    onRepsChange: (String) -> Unit,
+    onDoneToggle: () -> Unit
 ) {
+    val textColor = MaterialTheme.colorScheme.onSurface
+    val activeStyle = TextStyle(
+        fontSize = 15.sp,
+        fontWeight = FontWeight.Medium,
+        color = if (set.isDone) AppGreen else textColor,
+        textAlign = TextAlign.Center
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = if (isDone) AppGreen.copy(alpha = 0.08f) else Color.Transparent,
+                color = if (set.isDone) AppGreen.copy(alpha = 0.08f) else Color.Transparent,
                 shape = RoundedCornerShape(10.dp)
             )
             .padding(horizontal = 8.dp, vertical = 8.dp),
@@ -104,17 +174,26 @@ private fun WorkoutSetRow(
             text = "$index",
             fontWeight = FontWeight.Bold,
             fontSize = 15.sp,
-            color = if (isDone) AppGreen else MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f)
+            color = if (set.isDone) AppGreen else textColor,
+            modifier = Modifier.weight(0.7f)
         )
 
-        Text(
-            text = setInfo,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(2f),
-            textAlign = TextAlign.Center
+        SetInputField(
+            value = set.weight,
+            placeholder = set.suggestedWeight.ifBlank { "—" },
+            onValueChange = onWeightChange,
+            enabled = !set.isDone,
+            textStyle = activeStyle,
+            modifier = Modifier.weight(1.3f)
+        )
+
+        SetInputField(
+            value = set.reps,
+            placeholder = set.targetReps.toString(),
+            onValueChange = onRepsChange,
+            enabled = !set.isDone,
+            textStyle = activeStyle,
+            modifier = Modifier.weight(1.3f)
         )
 
         Box(
@@ -122,15 +201,15 @@ private fun WorkoutSetRow(
             contentAlignment = Alignment.CenterEnd
         ) {
             IconButton(
-                onClick = { onCheckedChange(!isDone) },
+                onClick = onDoneToggle,
                 modifier = Modifier.size(32.dp)
             ) {
                 Surface(
                     shape = CircleShape,
-                    color = if (isDone) AppGreen else Gray.copy(alpha = 0.2f),
+                    color = if (set.isDone) AppGreen else Gray.copy(alpha = 0.2f),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    if (isDone) {
+                    if (set.isDone) {
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = null,
@@ -141,5 +220,44 @@ private fun WorkoutSetRow(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SetInputField(
+    value: String,
+    placeholder: String,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean,
+    textStyle: TextStyle,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .background(
+                color = if (enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+                else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        if (value.isEmpty()) {
+            Text(
+                text = placeholder,
+                style = textStyle.copy(color = Gray.copy(alpha = 0.4f)),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        BasicTextField(
+            value = value,
+            onValueChange = { if (enabled) onValueChange(it.filter { c -> c.isDigit() || c == '.' }) },
+            textStyle = textStyle,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            cursorBrush = SolidColor(AppGreen),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled
+        )
     }
 }

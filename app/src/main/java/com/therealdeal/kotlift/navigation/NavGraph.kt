@@ -37,7 +37,7 @@ fun navigateAndClear(navController: NavHostController, targetRoute: Route) {
 @Composable
 fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, currentTheme: Theme, changeTheme: (theme: Theme) -> Unit) {
 
-    Box(Modifier.padding(bottom = innerPadding.calculateBottomPadding()))
+    Box(Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
         NavHost(
             navController = navController,
             startDestination = Route.Login
@@ -195,4 +195,6 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
                 CreateWorkoutScreen({}, innerPadding)
             }
         }
+    }
+
 }
