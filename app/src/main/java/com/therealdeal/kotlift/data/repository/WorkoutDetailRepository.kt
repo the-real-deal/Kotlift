@@ -2,7 +2,6 @@ package com.therealdeal.kotlift.data.repository
 
 import com.therealdeal.kotlift.data.remote.ApiResponse
 import com.therealdeal.kotlift.data.remote.RoutineExerciseDTO
-import com.therealdeal.kotlift.data.remote.RoutineSetDTO
 import com.therealdeal.kotlift.data.remote.WorkoutDetailDTO
 import com.therealdeal.kotlift.model.WorkoutDetail
 import io.github.jan.supabase.SupabaseClient
@@ -15,7 +14,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import com.therealdeal.kotlift.data.remote.ExerciseDTO
-import com.therealdeal.kotlift.model.RoutineSet
 import com.therealdeal.kotlift.model.ExerciseInWorkout
 
 class WorkoutDetailRepository(
@@ -41,36 +39,21 @@ class WorkoutDetailRepository(
                 }
                 .decodeList<RoutineExerciseDTO>()
 
-            val routineExerciseIds = routineExercises.map { it.id }
-
-            val allSets = supabase.postgrest["routine_sets"]
-                .select {
-                    filter { isIn("routine_exercise_id", routineExerciseIds) }
-                }
-                .decodeList<RoutineSetDTO>()
-
-            val setsMap = allSets.groupBy { it.routineExerciseId }
-
             val exercisesWithDetails = coroutineScope {
                 routineExercises.map { routineExercise ->
                     async {
                         val apiResponse = httpClient.get(
-                            "https://oss.exercisedb.dev/api/v1/exercises/"+routineExercise.externalExerciseId
+                            "https://oss.exercisedb.dev/api/v1/exercises/" + routineExercise.externalExerciseId
                         ).body<ApiResponse<ExerciseDTO>>()
-
-                        val exerciseDTO = apiResponse.data
-
-                        val sets = setsMap[routineExercise.id]
-                            ?.sortedBy { it.setNumber }
-                            ?.map { RoutineSet(setNumber = it.setNumber, targetReps = it.targetReps) }
-                            ?: emptyList()
 
                         ExerciseInWorkout(
                             routineExerciseId = routineExercise.id,
                             externalExerciseId = routineExercise.externalExerciseId,
                             orderIndex = routineExercise.orderIndex,
-                            sets = sets,
-                            exercise = exerciseDTO.toDomain()
+                            targetSets = routineExercise.targetSets,
+                            targetReps = routineExercise.targetReps,
+                            targetWeight = routineExercise.targetWeight,
+                            exercise = apiResponse.data.toDomain()
                         )
                     }
                 }.awaitAll()

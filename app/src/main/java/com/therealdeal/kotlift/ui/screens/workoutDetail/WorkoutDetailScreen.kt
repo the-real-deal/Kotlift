@@ -94,11 +94,7 @@ fun WorkoutDetailScreen(
                     }
 
                     items(workout.exercises) { exerciseWithDetails ->
-                        val totalSets = exerciseWithDetails.sets.size
-                        val avgReps = if (exerciseWithDetails.sets.isEmpty()) 0
-                        else exerciseWithDetails.sets.map { it.targetReps }.average().toInt()
-
-                        val subtitle = "$totalSets Sets • $avgReps Reps"
+                        val subtitle = "${exerciseWithDetails.targetSets} Sets • ${exerciseWithDetails.targetReps} Reps"
                         ExerciseRowCard(
                             title = exerciseWithDetails.exercise.name.replaceFirstChar { it.uppercase() },
                             subtitle = subtitle,

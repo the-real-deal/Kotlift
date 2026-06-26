@@ -11,5 +11,11 @@ data class RoutineExerciseDTO(
     @SerialName("external_exercise_id")
     val externalExerciseId: String,
     @SerialName("order_index")
-    val orderIndex: Int
+    val orderIndex: Int,
+    @SerialName("target_sets")
+    val targetSets: Int,
+    @SerialName("target_reps")
+    val targetReps: Int,
+    @SerialName("target_weight")
+    val targetWeight: Double
 )
