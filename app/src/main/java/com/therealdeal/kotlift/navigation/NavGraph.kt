@@ -169,6 +169,9 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
                     onNavigate = { nav ->
                     when (nav) {
                         ActiveWorkoutNavigation.Back -> navController.popBackStack()
+                        is ActiveWorkoutNavigation.ExerciseDetail -> navigateOnStack(
+                            navController,
+                            targetRoute = Route.ExerciseDetail(nav.id))
                     }
                 }, innerPadding = innerPadding)
             }

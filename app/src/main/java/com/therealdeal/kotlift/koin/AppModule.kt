@@ -2,6 +2,7 @@ package com.therealdeal.kotlift.koin
 
 import coil.ImageLoader
 import coil.decode.GifDecoder
+import com.therealdeal.kotlift.ui.screens.activeWorkout.ActiveWorkoutViewModel
 import com.therealdeal.kotlift.ui.screens.exerciseDetail.ExerciseDetailViewModel
 import com.therealdeal.kotlift.ui.screens.exercises.ExercisesViewModel
 import com.therealdeal.kotlift.ui.screens.home.HomeViewModel
@@ -33,4 +34,6 @@ val appModule = module {
     viewModel { ExercisesViewModel(get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get()) }
     viewModel { ThemeViewModel(get()) }
+    viewModel { ActiveWorkoutViewModel(
+        get(), get(), get(), get()) }
 }

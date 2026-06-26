@@ -23,6 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.ui.theme.AppGreen
 import com.therealdeal.kotlift.ui.theme.Gray
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 data class SetData(
     val weight: String = "",
@@ -36,6 +40,8 @@ data class SetData(
 fun WorkoutExerciseCard(
     exerciseName: String,
     targetMuscles: String,
+    gifUrl: String?,
+    onHeaderClick: () -> Unit,
     sets: List<SetData>,
     onSetChanged: (index: Int, updated: SetData) -> Unit,
     onAddSet: () -> Unit,
@@ -50,18 +56,39 @@ fun WorkoutExerciseCard(
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = exerciseName,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Target: $targetMuscles",
-                fontSize = 13.sp,
-                color = AppGreen,
-                fontWeight = FontWeight.Medium
-            )
+
+            // Header cliccabile con gif + nome + muscoli
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onHeaderClick() },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AsyncImage(
+                    model = gifUrl,
+                    contentDescription = exerciseName,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+                )
+                Column {
+                    Text(
+                        text = exerciseName,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Target: $targetMuscles",
+                        fontSize = 13.sp,
+                        color = AppGreen,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -96,7 +123,6 @@ fun WorkoutExerciseCard(
                         ))
                     }
                 )
-
                 if (index < sets.lastIndex) {
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
@@ -123,7 +149,6 @@ fun WorkoutExerciseCard(
                 ) {
                     Text(text = "− Remove set", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
-
                 Button(
                     onClick = onAddSet,
                     modifier = Modifier.weight(1f),

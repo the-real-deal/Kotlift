@@ -26,6 +26,7 @@ sealed class HomeNavigation(val route: Route?) {
 }
 
 sealed class ActiveWorkoutNavigation(val route: Route?) {
+    data class ExerciseDetail(val id: String) : ActiveWorkoutNavigation(Route.ExerciseDetail(id))
     object Back : ActiveWorkoutNavigation(null)
 }
 
