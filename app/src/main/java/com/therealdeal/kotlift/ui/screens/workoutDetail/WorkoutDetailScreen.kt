@@ -20,6 +20,7 @@ import com.therealdeal.kotlift.ui.composables.buttons.BottomFloatingButton
 import com.therealdeal.kotlift.ui.composables.cards.ExerciseRowCard
 import com.therealdeal.kotlift.ui.composables.headers.WorkoutDetailHeader
 import com.therealdeal.kotlift.ui.theme.Gray
+import com.therealdeal.kotlift.utils.formatDate
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -112,7 +113,7 @@ fun WorkoutDetailScreen(
                     title = workout.name,
                     duration = "${workout.estimatedTimeMinutes ?: 0} min",
                     difficulty = workout.difficulty?.name ?: "",
-                    createdAt = workout.createdAt.toString() ?: "",
+                    createdAt = formatDate(workout.createdAt),
                     onBackClick = { onNavigate(WorkoutDetailNavigation.Back) }
                 )
 

@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.therealdeal.kotlift.data.remote.WorkoutDTO
 import com.therealdeal.kotlift.model.Workout
 import com.therealdeal.kotlift.model.WorkoutDifficulty
 import com.therealdeal.kotlift.ui.composables.chips.ChipSize
@@ -61,7 +60,7 @@ fun WorkoutCard(
                     WorkoutDifficulty.Advanced -> MaterialTheme.colorScheme.error
                 }
                 GenericChip(
-                    text = workout.difficulty.toString() ?: "Intermediate",
+                    text = workout.difficulty.toString(),
                     size = ChipSize.Small,
                     backgroundColor = chipColor.copy(alpha = 0.2f),
                     textColor = chipColor

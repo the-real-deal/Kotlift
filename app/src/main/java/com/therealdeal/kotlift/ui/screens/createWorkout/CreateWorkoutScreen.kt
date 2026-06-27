@@ -26,8 +26,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Button
@@ -240,15 +240,15 @@ fun WorkoutHeader(
     LargeTopAppBar(
         title = {
             Text(
-                text = "Crea Workout",
+                text = "Create a workout",
                 style = MaterialTheme.typography.headlineLarge
             )
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Torna indietro"
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
                 )
             }
         },
@@ -308,7 +308,7 @@ fun DifficultySelector(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            DifficultyLevel.values().forEach { level ->
+            DifficultyLevel.entries.forEach { level ->
                 val isSelected = level == selectedDifficulty
 
                 val backgroundColor by animateColorAsState(

@@ -119,6 +119,13 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     // Gif
-    implementation(libs.coil.kt.coil.compose) // O la versione di Coil che stai usando
-    implementation(libs.coil.kt.coil.gif)     // Questa serve specificamente per le GIF
+    implementation(libs.coil.kt.coil.compose)
+    implementation(libs.coil.kt.coil.gif)
+
+    // OSMDroid for map rendering
+    implementation(libs.osmdroid.android)
+    // Location services
+    implementation(libs.play.services.location)
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
 }

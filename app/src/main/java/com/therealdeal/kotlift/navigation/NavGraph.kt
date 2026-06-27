@@ -18,6 +18,7 @@ import com.therealdeal.kotlift.ui.screens.login.LoginScreen
 import com.therealdeal.kotlift.ui.screens.profile.ProfileScreen
 import com.therealdeal.kotlift.ui.screens.register.RegisterScreen
 import com.therealdeal.kotlift.ui.screens.run.RunScreen
+import com.therealdeal.kotlift.ui.screens.run.RunningScreen
 import com.therealdeal.kotlift.ui.screens.stats.StatsScreen
 import com.therealdeal.kotlift.ui.screens.workoutDetail.WorkoutDetailScreen
 import com.therealdeal.kotlift.ui.screens.workouts.WorkoutsScreen
@@ -193,7 +194,15 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
             }
 
             slideComposable<Route.Run> {
-                RunScreen({}, innerPadding)
+                RunScreen(innerPadding = innerPadding) { nav ->
+                    when(nav) {
+                        RunNavigation.RunningNavigation -> navController.navigate(Route.Running)
+                    }
+                }
+            }
+
+            slideComposable<Route.Running> {
+                RunningScreen(innerPadding) {}
             }
 
             slideComposable<Route.CreateWorkout> {

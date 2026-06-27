@@ -16,10 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.therealdeal.kotlift.model.Session
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toLocalDateTime
-import java.time.format.DateTimeFormatter
+import com.therealdeal.kotlift.utils.formatDate
 
 @Composable
 fun SessionCard(session: Session) {
@@ -31,12 +28,6 @@ fun SessionCard(session: Session) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            val formatted = session.startedAt
-                ?.toLocalDateTime(TimeZone.currentSystemDefault())
-                ?.date
-                ?.toJavaLocalDate()
-                ?.format(formatter)?: "No date"
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -45,7 +36,7 @@ fun SessionCard(session: Session) {
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = formatted,
+                    text = formatDate(session.startedAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

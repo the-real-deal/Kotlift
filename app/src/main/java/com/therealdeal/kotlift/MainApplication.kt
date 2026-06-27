@@ -1,5 +1,6 @@
 package com.therealdeal.kotlift
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build.VERSION.SDK_INT
 import coil.ImageLoader
@@ -11,10 +12,17 @@ import com.therealdeal.kotlift.koin.dataModule
 import com.therealdeal.kotlift.koin.networkModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import org.osmdroid.config.Configuration
 
 class MainApplication : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
+
+        Configuration.getInstance().apply {
+            load(this@MainApplication, getSharedPreferences("osmdroid", MODE_PRIVATE))
+            userAgentValue = packageName
+        }
+
 
         startKoin {
             androidContext(this@MainApplication)
@@ -23,6 +31,7 @@ class MainApplication : Application(), ImageLoaderFactory {
     }
 
     // only for coil
+    @SuppressLint("ObsoleteSdkInt")
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
             .components {

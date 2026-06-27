@@ -9,6 +9,8 @@ import com.therealdeal.kotlift.ui.screens.home.HomeViewModel
 import com.therealdeal.kotlift.ui.screens.login.LoginViewModel
 import com.therealdeal.kotlift.ui.screens.profile.ProfileViewModel
 import com.therealdeal.kotlift.ui.screens.register.RegisterViewModel
+import com.therealdeal.kotlift.ui.screens.run.RunViewModel
+import com.therealdeal.kotlift.ui.screens.run.RunningViewModel
 import com.therealdeal.kotlift.ui.screens.stats.StatsViewModel
 import com.therealdeal.kotlift.ui.screens.workoutDetail.WorkoutDetailViewModel
 import com.therealdeal.kotlift.ui.screens.workouts.WorkoutsViewModel
@@ -36,4 +38,6 @@ val appModule = module {
     viewModel { ThemeViewModel(get()) }
     viewModel { ActiveWorkoutViewModel(
         get(), get(), get(), get()) }
+    viewModel { RunViewModel(get(), get()) }
+    viewModel { RunningViewModel(get()) }
 }
