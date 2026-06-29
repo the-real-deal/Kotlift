@@ -25,7 +25,7 @@ sealed interface ActiveWorkoutUiState {
 class ActiveWorkoutViewModel(
     authRepository: AuthRepository,
     private val workoutDetailRepository: WorkoutDetailRepository,
-    private val exerciseLibraryRepository: ExerciseLibraryRepository,  // ← nuovo
+    private val exerciseLibraryRepository: ExerciseLibraryRepository,
     private val sessionRepository: SessionRepository,
     private val workoutId: String
 ) : BaseViewModel(authRepository) {

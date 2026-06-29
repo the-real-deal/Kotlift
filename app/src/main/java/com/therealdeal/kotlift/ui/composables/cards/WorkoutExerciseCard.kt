@@ -27,6 +27,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 
 data class SetData(
@@ -59,7 +60,7 @@ fun WorkoutExerciseCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // Header cliccabile con gif + nome + muscoli
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -76,20 +77,26 @@ fun WorkoutExerciseCard(
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
                 )
-                Column {
+
+                Column(modifier = Modifier.weight(1f)) {  // ← weight(1f) occupa lo spazio rimasto
                     Text(
                         text = exerciseName,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "Target: $targetMuscles",
                         fontSize = 13.sp,
                         color = AppGreen,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+
                 IconButton(onClick = onRemoveExercise) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -98,7 +105,6 @@ fun WorkoutExerciseCard(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
