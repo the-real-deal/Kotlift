@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.therealdeal.kotlift.model.WorkoutDetail
 import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 sealed interface ActiveWorkoutUiState {
     data object Loading : ActiveWorkoutUiState
@@ -27,6 +29,41 @@ class ActiveWorkoutViewModel(
     private val _uiState = MutableStateFlow<ActiveWorkoutUiState>(ActiveWorkoutUiState.Loading)
     val uiState: StateFlow<ActiveWorkoutUiState> = _uiState.asStateFlow()
 
+    private val _elapsedSeconds = MutableStateFlow(0L)
+    val elapsedSeconds: StateFlow<Long> = _elapsedSeconds.asStateFlow()
+
+    private var timerJob: Job? = null
+
+    init {
+        loadWorkoutDetail()
+        startTimer()
+    }
+
+    private fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (true) {
+                delay(1000L)
+                _elapsedSeconds.value++
+            }
+        }
+    }
+
+    fun stopTimer() {
+        timerJob?.cancel()
+    }
+
+    fun formatElapsed(): String {
+        val s = _elapsedSeconds.value
+        val h = s / 3600
+        val m = (s % 3600) / 60
+        val sec = s % 60
+        return "%02d:%02d:%02d".format(h, m, sec)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopTimer()
+    }
     init {
         loadWorkoutDetail()
     }

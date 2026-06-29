@@ -147,8 +147,17 @@ fun ActiveWorkoutScreen(
                     }
                 }
 
+                val elapsedSeconds by viewModel.elapsedSeconds.collectAsStateWithLifecycle()
+
+                val timerText = remember(elapsedSeconds) {
+                    val h = elapsedSeconds / 3600
+                    val m = (elapsedSeconds % 3600) / 60
+                    val s = elapsedSeconds % 60
+                    "%02d:%02d:%02d".format(h, m, s)
+                }
+
                 ActiveWorkoutHeader(
-                    timerText = "00:00:00",
+                    timerText = timerText,
                     progressText = "Workout in progress",
                     onCloseClick = { onNavigate(ActiveWorkoutNavigation.Back) }
                 )

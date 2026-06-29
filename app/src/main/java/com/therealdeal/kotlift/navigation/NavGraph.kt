@@ -202,7 +202,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
             }
 
             slideComposable<Route.Running> {
-                RunningScreen(innerPadding) {}
+                RunningScreen() {}
             }
 
             slideComposable<Route.CreateWorkout> {
