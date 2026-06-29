@@ -23,7 +23,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ExercisesScreen(
     onNavigate: (ExercisesNavigation) -> Unit,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    selectionMode: Boolean = false  // ← nuovo parametro
 ) {
     val viewModel: ExercisesViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,9 +76,7 @@ fun ExercisesScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(uiState.error!!)
                         Spacer(modifier = Modifier.height(12.dp))
-                        Button(onClick = { viewModel.loadExercises() }) {
-                            Text("Retry")
-                        }
+                        Button(onClick = { viewModel.loadExercises() }) { Text("Retry") }
                     }
                 }
             }
@@ -102,20 +101,24 @@ fun ExercisesScreen(
                             category = exercise.equipment.firstOrNull()?.replaceFirstChar { it.uppercase() } ?: "",
                             target = exercise.targetMuscles.firstOrNull()?.replaceFirstChar { it.uppercase() } ?: "",
                             imageUrl = exercise.gifUrl,
-                            onClick = { onNavigate(ExercisesNavigation.ExerciseDetail(exercise.id)) }
+                            // ← comportamento diverso in base a selectionMode
+                            selectionMode = selectionMode,
+                            onClick = {
+                                if (selectionMode) {
+                                    onNavigate(ExercisesNavigation.ExerciseSelected(exercise.id))
+                                } else {
+                                    onNavigate(ExercisesNavigation.ExerciseDetail(exercise.id))
+                                }
+                            }
                         )
                     }
 
                     if (uiState.isLoadingMore) {
                         item(span = { GridItemSpan(2) }) {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
                                 contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
+                            ) { CircularProgressIndicator() }
                         }
                     }
                 }

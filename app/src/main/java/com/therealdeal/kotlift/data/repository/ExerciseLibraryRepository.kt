@@ -5,6 +5,7 @@ import com.therealdeal.kotlift.data.remote.ExerciseDTO
 import com.therealdeal.kotlift.data.remote.ExercisePage
 import com.therealdeal.kotlift.data.remote.MuscleDTO
 import com.therealdeal.kotlift.data.remote.PaginatedResponse
+import com.therealdeal.kotlift.model.Exercise
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -48,6 +49,15 @@ class ExerciseLibraryRepository(
                 nextCursor = response.meta?.nextCursor,
                 hasNextPage = response.meta?.hasNextPage ?: false
             )
+        }
+    }
+
+    suspend fun getExerciseById(id: String): Result<Exercise> {
+        return runCatching {
+            httpClient.get("$BASE_URL/exercises/$id")
+                .body<ApiResponse<ExerciseDTO>>()
+                .data
+                .toDomain()
         }
     }
 }

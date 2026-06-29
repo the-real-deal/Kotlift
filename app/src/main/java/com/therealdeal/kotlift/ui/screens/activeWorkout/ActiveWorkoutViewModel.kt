@@ -2,16 +2,19 @@ package com.therealdeal.kotlift.ui.screens.activeWorkout
 
 import androidx.lifecycle.viewModelScope
 import com.therealdeal.kotlift.data.repository.AuthRepository
+import com.therealdeal.kotlift.data.repository.ExerciseLibraryRepository
 import com.therealdeal.kotlift.data.repository.SessionRepository
 import com.therealdeal.kotlift.data.repository.WorkoutDetailRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import com.therealdeal.kotlift.model.ExerciseInWorkout
 import com.therealdeal.kotlift.model.WorkoutDetail
 import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 sealed interface ActiveWorkoutUiState {
     data object Loading : ActiveWorkoutUiState
@@ -22,9 +25,10 @@ sealed interface ActiveWorkoutUiState {
 class ActiveWorkoutViewModel(
     authRepository: AuthRepository,
     private val workoutDetailRepository: WorkoutDetailRepository,
+    private val exerciseLibraryRepository: ExerciseLibraryRepository,  // ← nuovo
     private val sessionRepository: SessionRepository,
     private val workoutId: String
-): BaseViewModel(authRepository)  {
+) : BaseViewModel(authRepository) {
 
     private val _uiState = MutableStateFlow<ActiveWorkoutUiState>(ActiveWorkoutUiState.Loading)
     val uiState: StateFlow<ActiveWorkoutUiState> = _uiState.asStateFlow()
@@ -48,38 +52,57 @@ class ActiveWorkoutViewModel(
         }
     }
 
-    fun stopTimer() {
-        timerJob?.cancel()
-    }
-
-    fun formatElapsed(): String {
-        val s = _elapsedSeconds.value
-        val h = s / 3600
-        val m = (s % 3600) / 60
-        val sec = s % 60
-        return "%02d:%02d:%02d".format(h, m, sec)
-    }
+    fun stopTimer() { timerJob?.cancel() }
 
     override fun onCleared() {
         super.onCleared()
         stopTimer()
-    }
-    init {
-        loadWorkoutDetail()
     }
 
     fun loadWorkoutDetail() {
         viewModelScope.launch {
             _uiState.value = ActiveWorkoutUiState.Loading
             workoutDetailRepository.getWorkoutDetail(workoutId)
-                .onSuccess { workout ->
-                    _uiState.value = ActiveWorkoutUiState.Success(workout)
-                }
+                .onSuccess { workout -> _uiState.value = ActiveWorkoutUiState.Success(workout) }
                 .onFailure { error ->
                     _uiState.value = ActiveWorkoutUiState.Error(
                         error.message ?: "Failed to load workout"
                     )
                 }
         }
+    }
+
+    fun addExercise(exerciseId: String) {
+        viewModelScope.launch {
+            val current = (_uiState.value as? ActiveWorkoutUiState.Success) ?: return@launch
+            exerciseLibraryRepository.getExerciseById(exerciseId)
+                .onSuccess { exercise ->
+                    val newExercise = ExerciseInWorkout(
+                        routineExerciseId = UUID.randomUUID().toString(),
+                        externalExerciseId = exercise.id,
+                        orderIndex = current.workout.exercises.size,
+                        targetSets = 3,
+                        targetReps = 10,
+                        targetWeight = 0.0,
+                        exercise = exercise
+                    )
+                    _uiState.value = ActiveWorkoutUiState.Success(
+                        current.workout.copy(
+                            exercises = current.workout.exercises + newExercise
+                        )
+                    )
+                }
+        }
+    }
+
+    fun removeExercise(routineExerciseId: String) {
+        val current = (_uiState.value as? ActiveWorkoutUiState.Success) ?: return
+        _uiState.value = ActiveWorkoutUiState.Success(
+            current.workout.copy(
+                exercises = current.workout.exercises.filter {
+                    it.routineExerciseId != routineExerciseId
+                }
+            )
+        )
     }
 }

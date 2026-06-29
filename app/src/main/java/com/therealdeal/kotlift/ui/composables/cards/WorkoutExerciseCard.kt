@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.ui.theme.AppGreen
 import com.therealdeal.kotlift.ui.theme.Gray
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
@@ -46,6 +47,7 @@ fun WorkoutExerciseCard(
     onSetChanged: (index: Int, updated: SetData) -> Unit,
     onAddSet: () -> Unit,
     onRemoveSet: () -> Unit,
+    onRemoveExercise: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -86,6 +88,13 @@ fun WorkoutExerciseCard(
                         fontSize = 13.sp,
                         color = AppGreen,
                         fontWeight = FontWeight.Medium
+                    )
+                }
+                IconButton(onClick = onRemoveExercise) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Rimuovi esercizio",
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }

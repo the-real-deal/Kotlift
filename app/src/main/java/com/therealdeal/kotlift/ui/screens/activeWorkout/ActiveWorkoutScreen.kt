@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -14,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.therealdeal.kotlift.navigation.ActiveWorkoutNavigation
 import com.therealdeal.kotlift.ui.composables.buttons.BottomFloatingButton
 import com.therealdeal.kotlift.ui.composables.cards.SetData
@@ -26,11 +28,33 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun ActiveWorkoutScreen(
     workoutId: String,
+    navController: NavController,  // ← nuovo, per leggere savedStateHandle
     viewModel: ActiveWorkoutViewModel = koinViewModel(parameters = { parametersOf(workoutId) }),
     onNavigate: (ActiveWorkoutNavigation) -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val elapsedSeconds by viewModel.elapsedSeconds.collectAsStateWithLifecycle()
+
+    val timerText = remember(elapsedSeconds) {
+        val h = elapsedSeconds / 3600
+        val m = (elapsedSeconds % 3600) / 60
+        val s = elapsedSeconds % 60
+        "%02d:%02d:%02d".format(h, m, s)
+    }
+
+    // Legge l'esercizio selezionato tornato da ExercisesScreen
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val selectedExerciseId by savedStateHandle
+        ?.getStateFlow("selected_exercise_id", "")
+        ?.collectAsStateWithLifecycle() ?: remember { mutableStateOf("") }
+
+    LaunchedEffect(selectedExerciseId) {
+        if (selectedExerciseId.isNotBlank()) {
+            viewModel.addExercise(selectedExerciseId)
+            savedStateHandle?.set("selected_exercise_id", "")
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -49,9 +73,7 @@ fun ActiveWorkoutScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = state.message, color = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { viewModel.loadWorkoutDetail() }) {
-                            Text("Retry")
-                        }
+                        Button(onClick = { viewModel.loadWorkoutDetail() }) { Text("Retry") }
                     }
                 }
             }
@@ -62,12 +84,11 @@ fun ActiveWorkoutScreen(
                 val setsMap = remember(workout.exercises) {
                     mutableStateMapOf<String, List<SetData>>().apply {
                         workout.exercises.forEach { ex ->
-                            this[ex.routineExerciseId] = List(ex.targetSets) { index ->
+                            this[ex.routineExerciseId] = List(ex.targetSets) {
                                 SetData(
                                     targetReps = ex.targetReps,
                                     suggestedWeight = if (ex.targetWeight > 0.0)
-                                        ex.targetWeight.toInt().toString()
-                                    else ""
+                                        ex.targetWeight.toInt().toString() else ""
                                 )
                             }
                         }
@@ -109,7 +130,10 @@ fun ActiveWorkoutScreen(
                         }
                     }
 
-                    itemsIndexed(workout.exercises) { _, exercise ->
+                    itemsIndexed(
+                        workout.exercises,
+                        key = { _, exercise -> exercise.routineExerciseId }
+                    ) { _, exercise ->
                         val sets = setsMap[exercise.routineExerciseId] ?: emptyList()
 
                         Box(modifier = Modifier.padding(horizontal = 12.dp)) {
@@ -141,19 +165,35 @@ fun ActiveWorkoutScreen(
                                     if (sets.size > 1) {
                                         setsMap[exercise.routineExerciseId] = sets.dropLast(1)
                                     }
+                                },
+                                onRemoveExercise = {
+                                    viewModel.removeExercise(exercise.routineExerciseId)
                                 }
                             )
                         }
                     }
-                }
 
-                val elapsedSeconds by viewModel.elapsedSeconds.collectAsStateWithLifecycle()
-
-                val timerText = remember(elapsedSeconds) {
-                    val h = elapsedSeconds / 3600
-                    val m = (elapsedSeconds % 3600) / 60
-                    val s = elapsedSeconds % 60
-                    "%02d:%02d:%02d".format(h, m, s)
+                    // ← pulsante aggiungi esercizio in fondo alla lista
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { onNavigate(ActiveWorkoutNavigation.OpenExercisePicker) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Aggiungi esercizio")
+                            }
+                        }
+                    }
                 }
 
                 ActiveWorkoutHeader(

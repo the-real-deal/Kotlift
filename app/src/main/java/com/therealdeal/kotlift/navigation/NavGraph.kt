@@ -29,73 +29,47 @@ fun navigateOnStack(navController: NavHostController, targetRoute: Route) {
 
 fun navigateAndClear(navController: NavHostController, targetRoute: Route) {
     navController.navigate(targetRoute) {
-        popUpTo(0) {
-            inclusive = true
-        }
+        popUpTo(0) { inclusive = true }
         launchSingleTop = true
     }
 }
-@Composable
-fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, currentTheme: Theme, changeTheme: (theme: Theme) -> Unit) {
 
+@Composable
+fun NavGraph(
+    navController: NavHostController,
+    innerPadding: PaddingValues,
+    currentTheme: Theme,
+    changeTheme: (theme: Theme) -> Unit
+) {
     Box(Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
-        NavHost(
-            navController = navController,
-            startDestination = Route.Login
-        ) {
+        NavHost(navController = navController, startDestination = Route.Login) {
+
             slideComposable<Route.Login> {
-                LoginScreen(onNavigate = {nav -> when(nav) {
-                    LoginNavigation.Home -> navigateAndClear(
-                        navController,
-                        targetRoute = Route.Home
-                    )
-                    LoginNavigation.Register -> navigateAndClear(
-                        navController,
-                        targetRoute = Route.Register
-                    )
-                } })
+                LoginScreen(onNavigate = { nav ->
+                    when (nav) {
+                        LoginNavigation.Home -> navigateAndClear(navController, Route.Home)
+                        LoginNavigation.Register -> navigateAndClear(navController, Route.Register)
+                    }
+                })
             }
+
             slideComposable<Route.Register> {
                 RegisterScreen { nav ->
                     when (nav) {
-                        RegisterNavigation.Home -> navigateAndClear(
-                            navController,
-                            targetRoute = Route.Home
-                        )
-
-                        RegisterNavigation.Login -> navigateAndClear(
-                            navController,
-                            targetRoute = Route.Login
-                        )
+                        RegisterNavigation.Home -> navigateAndClear(navController, Route.Home)
+                        RegisterNavigation.Login -> navigateAndClear(navController, Route.Login)
                     }
                 }
             }
+
             slideComposable<Route.Home> {
                 HomeScreen(onNavigate = { nav ->
                     when (nav) {
-                        HomeNavigation.Workouts -> navigateAndClear(
-                            navController,
-                            targetRoute = Route.Workouts
-                        )
-
-                        HomeNavigation.Stats -> navigateAndClear(
-                            navController,
-                            targetRoute = Route.Stats
-                        )
-                        HomeNavigation.Exercises -> navigateOnStack(
-                            navController,
-                            targetRoute = Route.Exercises
-                        )
-
-                        is HomeNavigation.WorkoutDetail -> navigateOnStack(
-                            navController,
-                            targetRoute = Route.WorkoutDetail(workoutId = nav.id)
-                        )
-
-                        HomeNavigation.CreateWorkout -> navigateOnStack(
-                            navController,
-                            targetRoute = Route.CreateWorkout
-                        )
+                        HomeNavigation.Workouts -> navigateAndClear(navController, Route.Workouts)
+                        HomeNavigation.Stats -> navigateAndClear(navController, Route.Stats)
+                        HomeNavigation.Exercises -> navigateOnStack(navController, Route.Exercises())
+                        is HomeNavigation.WorkoutDetail -> navigateOnStack(navController, Route.WorkoutDetail(nav.id))
+                        HomeNavigation.CreateWorkout -> navigateOnStack(navController, Route.CreateWorkout)
                     }
                 })
             }
@@ -104,10 +78,7 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
                 WorkoutsScreen(
                     onNavigate = { nav ->
                         when (nav) {
-                            is WorkoutsNavigation.WorkoutDetail -> navigateOnStack(
-                                navController,
-                                targetRoute = nav.route!!
-                            )
+                            is WorkoutsNavigation.WorkoutDetail -> navigateOnStack(navController, nav.route!!)
                         }
                     },
                     innerPadding = innerPadding,
@@ -121,37 +92,40 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
                     onNavigate = { nav ->
                         when (nav) {
                             WorkoutDetailNavigation.Back -> navController.popBackStack()
-                            is WorkoutDetailNavigation.ExerciseDetail -> navigateOnStack(
-                                navController,
-                                targetRoute = nav.route!!
-                            )
-
-                            is WorkoutDetailNavigation.ActiveWorkout -> navigateOnStack(
-                                navController,
-                                targetRoute = nav.route!!
-                            )
+                            is WorkoutDetailNavigation.ExerciseDetail -> navigateOnStack(navController, nav.route!!)
+                            is WorkoutDetailNavigation.ActiveWorkout -> navigateOnStack(navController, nav.route!!)
                         }
                     },
                     innerPadding = innerPadding
                 )
             }
 
-            slideComposable<Route.Exercises> {
+            // ← Route.Exercises ora è data class con selectionMode
+            slideComposable<Route.Exercises> { backStack ->
+                val route = backStack.toRoute<Route.Exercises>()
                 ExercisesScreen(
-                    { nav ->
+                    onNavigate = { nav ->
                         when (nav) {
                             ExercisesNavigation.Back -> navController.popBackStack()
                             is ExercisesNavigation.ExerciseDetail -> navigateOnStack(
                                 navController,
-                                targetRoute = Route.ExerciseDetail(nav.id)
+                                Route.ExerciseDetail(nav.id)
                             )
+                            // Torna indietro passando l'id selezionato tramite savedStateHandle
+                            is ExercisesNavigation.ExerciseSelected -> {
+                                navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("selected_exercise_id", nav.exerciseId)
+                                navController.popBackStack()
+                            }
                         }
                     },
-                    innerPadding = innerPadding
+                    innerPadding = innerPadding,
+                    selectionMode = route.selectionMode  // ← passato alla screen
                 )
             }
 
-            slideComposable<Route.ExerciseDetail> {backStack ->
+            slideComposable<Route.ExerciseDetail> { backStack ->
                 val route = backStack.toRoute<Route.ExerciseDetail>()
                 ExerciseDetailScreen(
                     onNavigate = { nav ->
@@ -165,16 +139,26 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
             }
 
             slideComposable<Route.ActiveWorkout> { backStack ->
-                val route = backStack.toRoute<Route.WorkoutDetail>()
-                ActiveWorkoutScreen(workoutId = route.workoutId,
+                val route = backStack.toRoute<Route.ActiveWorkout>()
+                ActiveWorkoutScreen(
+                    workoutId = route.workoutId,
+                    // Passa il navController per leggere savedStateHandle
+                    navController = navController,
                     onNavigate = { nav ->
-                    when (nav) {
-                        ActiveWorkoutNavigation.Back -> navController.popBackStack()
-                        is ActiveWorkoutNavigation.ExerciseDetail -> navigateOnStack(
-                            navController,
-                            targetRoute = Route.ExerciseDetail(nav.id))
-                    }
-                }, innerPadding = innerPadding)
+                        when (nav) {
+                            ActiveWorkoutNavigation.Back -> navController.popBackStack()
+                            is ActiveWorkoutNavigation.ExerciseDetail -> navigateOnStack(
+                                navController,
+                                Route.ExerciseDetail(nav.id)
+                            )
+                            ActiveWorkoutNavigation.OpenExercisePicker -> navigateOnStack(
+                                navController,
+                                Route.Exercises(selectionMode = true)
+                            )
+                        }
+                    },
+                    innerPadding = innerPadding
+                )
             }
 
             slideComposable<Route.Stats> {
@@ -183,19 +167,17 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
 
             slideComposable<Route.Profile> {
                 ProfileScreen(currentTheme, onNavigate = { nav ->
-                    when(nav) {
-                        ProfileNavigation.Login -> navController.navigate(Route.Login){
+                    when (nav) {
+                        ProfileNavigation.Login -> navController.navigate(Route.Login) {
                             popUpTo(0) { inclusive = true }
                         }
                     }
-                }) { theme ->
-                    changeTheme(theme)
-                }
+                }) { theme -> changeTheme(theme) }
             }
 
             slideComposable<Route.Run> {
                 RunScreen(innerPadding = innerPadding) { nav ->
-                    when(nav) {
+                    when (nav) {
                         RunNavigation.RunningNavigation -> navController.navigate(Route.Running)
                     }
                 }
@@ -210,5 +192,4 @@ fun NavGraph(navController: NavHostController, innerPadding: PaddingValues, curr
             }
         }
     }
-
 }

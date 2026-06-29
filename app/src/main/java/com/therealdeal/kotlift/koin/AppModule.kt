@@ -37,7 +37,7 @@ val appModule = module {
     viewModel { ProfileViewModel(get(), get(), get()) }
     viewModel { ThemeViewModel(get()) }
     viewModel { ActiveWorkoutViewModel(
-        get(), get(), get(), get()) }
+        get(), get(), get(), get(),get()) }
     viewModel { RunViewModel(get(), get()) }
     viewModel { RunningViewModel(get(), get()) }
 }
