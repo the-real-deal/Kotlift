@@ -1,5 +1,6 @@
 package com.therealdeal.kotlift.ui.screens.activeWorkout
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,13 +29,14 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun ActiveWorkoutScreen(
     workoutId: String,
-    navController: NavController,  // ← nuovo, per leggere savedStateHandle
+    navController: NavController,
     viewModel: ActiveWorkoutViewModel = koinViewModel(parameters = { parametersOf(workoutId) }),
     onNavigate: (ActiveWorkoutNavigation) -> Unit,
     innerPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val elapsedSeconds by viewModel.elapsedSeconds.collectAsStateWithLifecycle()
+    val saveSessionState by viewModel.saveSessionState.collectAsStateWithLifecycle()
 
     val timerText = remember(elapsedSeconds) {
         val h = elapsedSeconds / 3600
@@ -43,7 +45,16 @@ fun ActiveWorkoutScreen(
         "%02d:%02d:%02d".format(h, m, s)
     }
 
-    // Legge l'esercizio selezionato tornato da ExercisesScreen
+    var showExitDialog by remember { mutableStateOf(false) }
+    var showFinishDialog by remember { mutableStateOf(false) }
+
+    // setsMap fuori dal when per poterlo passare a finishWorkout
+    val setsMap = remember { mutableStateMapOf<String, List<SetData>>() }
+
+    // Intercetta back fisico
+    BackHandler { showExitDialog = true }
+
+    // Legge esercizio selezionato tornato da ExercisesScreen
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val selectedExerciseId by savedStateHandle
         ?.getStateFlow("selected_exercise_id", "")
@@ -54,6 +65,71 @@ fun ActiveWorkoutScreen(
             viewModel.addExercise(selectedExerciseId)
             savedStateHandle?.set("selected_exercise_id", "")
         }
+    }
+
+    LaunchedEffect(saveSessionState) {
+        if (saveSessionState is SaveSessionState.Saved) {
+            onNavigate(ActiveWorkoutNavigation.Back)
+        }
+    }
+
+    val allSetsDone = remember(setsMap) {
+        setsMap.values.isNotEmpty() && setsMap.values.all { sets -> sets.all { it.isDone } }
+    }
+
+    if (showFinishDialog) {
+        AlertDialog(
+            onDismissRequest = { showFinishDialog = false },
+            title = { Text("Finire il workout?") },
+            text = {
+                if (allSetsDone) {
+                    Text("Il workout verrà salvato.")
+                } else {
+                    Text(
+                        "Non hai completato tutte le serie. Completa tutti i set prima di finire.",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showFinishDialog = false
+                        viewModel.finishWorkout(setsMap)
+                    },
+                    enabled = allSetsDone  // ← disabilitato se non tutti i set sono done
+                ) {
+                    Text("Salva")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showFinishDialog = false }) {
+                    Text("Annulla")
+                }
+            }
+        )
+    }
+
+    // Dialog: finisci e salva
+    if (showFinishDialog) {
+        AlertDialog(
+            onDismissRequest = { showFinishDialog = false },
+            title = { Text("Finire il workout?") },
+            text = { Text("Il workout verrà salvato.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showFinishDialog = false
+                    viewModel.finishWorkout(setsMap)
+                }) {
+                    Text("Salva")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showFinishDialog = false }) {
+                    Text("Annulla")
+                }
+            }
+        )
     }
 
     Box(
@@ -81,10 +157,11 @@ fun ActiveWorkoutScreen(
             is ActiveWorkoutUiState.Success -> {
                 val workout = state.workout
 
-                val setsMap = remember(workout.exercises) {
-                    mutableStateMapOf<String, List<SetData>>().apply {
-                        workout.exercises.forEach { ex ->
-                            this[ex.routineExerciseId] = List(ex.targetSets) {
+                // Sincronizza setsMap con gli esercizi correnti
+                LaunchedEffect(workout.exercises) {
+                    workout.exercises.forEach { ex ->
+                        if (!setsMap.containsKey(ex.routineExerciseId)) {
+                            setsMap[ex.routineExerciseId] = List(ex.targetSets) {
                                 SetData(
                                     targetReps = ex.targetReps,
                                     suggestedWeight = if (ex.targetWeight > 0.0)
@@ -93,6 +170,8 @@ fun ActiveWorkoutScreen(
                             }
                         }
                     }
+                    val activeIds = workout.exercises.map { it.routineExerciseId }.toSet()
+                    setsMap.keys.retainAll(activeIds)
                 }
 
                 LazyColumn(
@@ -173,7 +252,6 @@ fun ActiveWorkoutScreen(
                         }
                     }
 
-                    // ← pulsante aggiungi esercizio in fondo alla lista
                     item {
                         Box(
                             modifier = Modifier
@@ -184,11 +262,7 @@ fun ActiveWorkoutScreen(
                                 onClick = { onNavigate(ActiveWorkoutNavigation.OpenExercisePicker) },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
+                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text("Aggiungi esercizio")
                             }
@@ -199,22 +273,39 @@ fun ActiveWorkoutScreen(
                 ActiveWorkoutHeader(
                     timerText = timerText,
                     progressText = "Workout in progress",
-                    onCloseClick = { onNavigate(ActiveWorkoutNavigation.Back) }
+                    onCloseClick = { showExitDialog = true }  // ← dialog, non Back diretto
                 )
 
-                BottomFloatingButton(
-                    text = "Stop",
-                    onClick = { },
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 24.dp),
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Face,
-                            contentDescription = "Stop"
-                        )
+                if (saveSessionState is SaveSessionState.Saving) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 24.dp)
+                    ) {
+                        CircularProgressIndicator()
                     }
-                )
+                } else {
+                    BottomFloatingButton(
+                        text = "Fine",
+                        onClick = { showFinishDialog = true },  // ← dialog, non salva diretto
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 24.dp),
+                        icon = {
+                            Icon(imageVector = Icons.Default.Face, contentDescription = "Fine")
+                        }
+                    )
+                }
+
+                if (saveSessionState is SaveSessionState.Error) {
+                    Snackbar(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 100.dp)
+                    ) {
+                        Text((saveSessionState as SaveSessionState.Error).message)
+                    }
+                }
             }
         }
     }
