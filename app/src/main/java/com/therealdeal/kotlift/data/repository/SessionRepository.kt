@@ -11,19 +11,15 @@ import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import kotlinx.serialization.Serializable
 
 @Serializable
 private data class CreateSessionRequest(
     @SerialName("profile_id") val profileId: String,
     @SerialName("workout_id") val workoutId: String,
-    @SerialName("started_at") val startedAt: String
-)
-
-@Serializable
-private data class CompleteSessionRequest(
+    @SerialName("started_at") val startedAt: String,
     @SerialName("actual_duration_minutes") val actualDurationMinutes: Int,
     @SerialName("total_weight_lifted") val totalWeightLifted: Double
 )
@@ -87,60 +83,36 @@ class SessionRepository(
     }
 
     @OptIn(ExperimentalTime::class)
-    suspend fun createSession(workoutId: String): Result<Session> {
-        return runCatching {
-            val currentUserId = supabase.auth.currentUserOrNull()?.id
-                ?: error("User not authenticated")
-
-            supabase.postgrest["sessions"]
-                .insert(
-                    CreateSessionRequest(
-                        profileId = currentUserId,
-                        workoutId = workoutId,
-                        startedAt = Clock.System.now().toString()
-                    )
-                ) { select() }
-                .decodeSingle<SessionDTO>()
-                .toDomain()
-        }
-    }
-
-    suspend fun completeSession(
-        sessionId: String,
-        actualDurationMinutes: Int,
-        totalWeightLifted: Double
-    ): Result<Session> {
-        return runCatching {
-            supabase.auth.currentUserOrNull() ?: error("User not authenticated")
-
-            supabase.postgrest["sessions"]
-                .update(
-                    CompleteSessionRequest(
-                        actualDurationMinutes = actualDurationMinutes,
-                        totalWeightLifted = totalWeightLifted
-                    )
-                ) {
-                    filter { eq("id", sessionId) }
-                    select()
-                }
-                .decodeSingle<SessionDTO>()
-                .toDomain()
-        }
-    }
-
-    suspend fun saveSessionExercisesAndSets(
-        sessionId: String,
+    suspend fun saveFullSession(
+        workoutId: String,
+        durationMinutes: Int,
+        totalWeightLifted: Double,
         exercises: List<ExerciseInWorkout>,
         setsMap: Map<String, List<SetData>>
     ): Result<Unit> {
         return runCatching {
-            supabase.auth.currentUserOrNull() ?: error("User not authenticated")
+            val currentUserId = supabase.auth.currentUserOrNull()?.id
+                ?: error("User not authenticated")
 
+            // 1. Crea la sessione completa in un colpo solo
+            val session = supabase.postgrest["sessions"]
+                .insert(
+                    CreateSessionRequest(
+                        profileId = currentUserId,
+                        workoutId = workoutId,
+                        startedAt = Clock.System.now().toString(),
+                        actualDurationMinutes = durationMinutes,
+                        totalWeightLifted = totalWeightLifted
+                    )
+                ) { select() }
+                .decodeSingle<SessionDTO>()
+
+            // 2. Per ogni esercizio, crea session_exercise e i relativi set
             exercises.forEachIndexed { index, exercise ->
                 val sessionExercise = supabase.postgrest["session_exercises"]
                     .insert(
                         CreateSessionExerciseRequest(
-                            sessionId = sessionId,
+                            sessionId = session.id,
                             externalExerciseId = exercise.externalExerciseId,
                             orderIndex = index
                         )
@@ -151,27 +123,17 @@ class SessionRepository(
                 val doneSets = sets.filter { it.isDone }
                 if (doneSets.isEmpty()) return@forEachIndexed
 
-                val setInserts = doneSets.mapIndexed { setIndex, set ->
-                    CreateSessionSetRequest(
-                        sessionExerciseId = sessionExercise.id,
-                        setOrder = setIndex,
-                        performedReps = set.reps.ifBlank { set.targetReps.toString() }.toIntOrNull() ?: 0,
-                        weight = set.weight.ifBlank { set.suggestedWeight }.toDoubleOrNull() ?: 0.0
-                    )
-                }
-
-                supabase.postgrest["session_sets"].insert(setInserts)
+                supabase.postgrest["session_sets"].insert(
+                    doneSets.mapIndexed { setIndex, set ->
+                        CreateSessionSetRequest(
+                            sessionExerciseId = sessionExercise.id,
+                            setOrder = setIndex,
+                            performedReps = set.reps.ifBlank { set.targetReps.toString() }.toIntOrNull() ?: 0,
+                            weight = set.weight.ifBlank { set.suggestedWeight }.toDoubleOrNull() ?: 0.0
+                        )
+                    }
+                )
             }
-        }
-    }
-
-    suspend fun deleteSession(sessionId: String): Result<Unit> {
-        return runCatching {
-            supabase.auth.currentUserOrNull() ?: error("User not authenticated")
-            supabase.postgrest["sessions"]
-                .delete {
-                    filter { eq("id", sessionId) }
-                }
         }
     }
 }

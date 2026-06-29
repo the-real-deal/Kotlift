@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,14 +47,10 @@ fun ActiveWorkoutScreen(
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showFinishDialog by remember { mutableStateOf(false) }
-
-    // setsMap fuori dal when per poterlo passare a finishWorkout
     val setsMap = remember { mutableStateMapOf<String, List<SetData>>() }
 
-    // Intercetta back fisico
     BackHandler { showExitDialog = true }
 
-    // Legge esercizio selezionato tornato da ExercisesScreen
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val selectedExerciseId by savedStateHandle
         ?.getStateFlow("selected_exercise_id", "")
@@ -73,63 +69,65 @@ fun ActiveWorkoutScreen(
         }
     }
 
-    val allSetsDone = remember(setsMap) {
-        setsMap.values.isNotEmpty() && setsMap.values.all { sets -> sets.all { it.isDone } }
+    val allSetsDone by remember {
+        derivedStateOf {
+            setsMap.values.isNotEmpty() && setsMap.values.all { sets -> sets.all { it.isDone } }
+        }
     }
 
-    if (showFinishDialog) {
+    if (showExitDialog) {
         AlertDialog(
-            onDismissRequest = { showFinishDialog = false },
-            title = { Text("Finire il workout?") },
-            text = {
-                if (allSetsDone) {
-                    Text("Il workout verrà salvato.")
-                } else {
-                    Text(
-                        "Non hai completato tutte le serie. Completa tutti i set prima di finire.",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showFinishDialog = false
-                        viewModel.finishWorkout(setsMap)
-                    },
-                    enabled = allSetsDone  // ← disabilitato se non tutti i set sono done
-                ) {
-                    Text("Salva")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showFinishDialog = false }) {
-                    Text("Annulla")
-                }
-            }
-        )
-    }
-
-    // Dialog: finisci e salva
-    if (showFinishDialog) {
-        AlertDialog(
-            onDismissRequest = { showFinishDialog = false },
-            title = { Text("Finire il workout?") },
-            text = { Text("Il workout verrà salvato.") },
+            onDismissRequest = { showExitDialog = false },
+            title = { Text("Abandon workout?") },
+            text = { Text("Your progress will not be saved.") },
             confirmButton = {
                 TextButton(onClick = {
-                    showFinishDialog = false
-                    viewModel.finishWorkout(setsMap)
+                    showExitDialog = false
+                    onNavigate(ActiveWorkoutNavigation.Back)
                 }) {
-                    Text("Salva")
+                    Text("Exit", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showFinishDialog = false }) {
-                    Text("Annulla")
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text("Keep going")
                 }
             }
         )
+    }
+
+    if (showFinishDialog) {
+        if (!allSetsDone) {
+            AlertDialog(
+                onDismissRequest = { showFinishDialog = false },
+                title = { Text("Incomplete workout") },
+                text = { Text("You haven't completed all sets. Mark every set as done before finishing.") },
+                confirmButton = {
+                    TextButton(onClick = { showFinishDialog = false }) {
+                        Text("Ok")
+                    }
+                }
+            )
+        } else {
+            AlertDialog(
+                onDismissRequest = { showFinishDialog = false },
+                title = { Text("Finish workout?") },
+                text = { Text("Your session will be saved.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showFinishDialog = false
+                        viewModel.finishWorkout(setsMap)
+                    }) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showFinishDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
     }
 
     Box(
@@ -149,7 +147,9 @@ fun ActiveWorkoutScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = state.message, color = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { viewModel.loadWorkoutDetail() }) { Text("Retry") }
+                        Button(onClick = { viewModel.loadWorkoutDetail() }) {
+                            Text("Retry")
+                        }
                     }
                 }
             }
@@ -157,7 +157,6 @@ fun ActiveWorkoutScreen(
             is ActiveWorkoutUiState.Success -> {
                 val workout = state.workout
 
-                // Sincronizza setsMap con gli esercizi correnti
                 LaunchedEffect(workout.exercises) {
                     workout.exercises.forEach { ex ->
                         if (!setsMap.containsKey(ex.routineExerciseId)) {
@@ -262,9 +261,13 @@ fun ActiveWorkoutScreen(
                                 onClick = { onNavigate(ActiveWorkoutNavigation.OpenExercisePicker) },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Aggiungi esercizio")
+                                Text("Add exercise")
                             }
                         }
                     }
@@ -273,7 +276,7 @@ fun ActiveWorkoutScreen(
                 ActiveWorkoutHeader(
                     timerText = timerText,
                     progressText = "Workout in progress",
-                    onCloseClick = { showExitDialog = true }  // ← dialog, non Back diretto
+                    onCloseClick = { showExitDialog = true }
                 )
 
                 if (saveSessionState is SaveSessionState.Saving) {
@@ -286,13 +289,16 @@ fun ActiveWorkoutScreen(
                     }
                 } else {
                     BottomFloatingButton(
-                        text = "Fine",
-                        onClick = { showFinishDialog = true },  // ← dialog, non salva diretto
+                        text = "Finish",
+                        onClick = { showFinishDialog = true },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(bottom = 24.dp),
                         icon = {
-                            Icon(imageVector = Icons.Default.Face, contentDescription = "Fine")
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = "Finish workout"
+                            )
                         }
                     )
                 }

@@ -47,12 +47,11 @@ class ActiveWorkoutViewModel(
     val saveSessionState: StateFlow<SaveSessionState> = _saveSessionState.asStateFlow()
 
     private var timerJob: Job? = null
-    private var currentSessionId: String? = null
 
     init {
         loadWorkoutDetail()
         startTimer()
-        startSession()
+        // Niente startSession() qui — il DB si tocca solo al salvataggio finale
     }
 
     private fun startTimer() {
@@ -64,9 +63,7 @@ class ActiveWorkoutViewModel(
         }
     }
 
-    fun stopTimer() {
-        timerJob?.cancel()
-    }
+    fun stopTimer() { timerJob?.cancel() }
 
     override fun onCleared() {
         super.onCleared()
@@ -82,15 +79,7 @@ class ActiveWorkoutViewModel(
         }
     }
 
-    private fun startSession() {
-        viewModelScope.launch {
-            sessionRepository.createSession(workoutId)
-                .onSuccess { currentSessionId = it.id }
-        }
-    }
-
     fun finishWorkout(setsMap: Map<String, List<SetData>>) {
-        val sessionId = currentSessionId ?: return
         val current = (_uiState.value as? ActiveWorkoutUiState.Success) ?: return
         val durationMinutes = (_elapsedSeconds.value / 60).toInt()
 
@@ -104,23 +93,20 @@ class ActiveWorkoutViewModel(
 
         viewModelScope.launch {
             _saveSessionState.value = SaveSessionState.Saving
-
-            sessionRepository.saveSessionExercisesAndSets(
-                sessionId = sessionId,
+            sessionRepository.saveFullSession(
+                workoutId = workoutId,
+                durationMinutes = durationMinutes,
+                totalWeightLifted = totalWeight,
                 exercises = current.workout.exercises,
                 setsMap = setsMap
-            ).onFailure {
-                _saveSessionState.value = SaveSessionState.Error(it.message ?: "Failed to save sets")
-                return@launch
-            }
-
-            sessionRepository.completeSession(
-                sessionId = sessionId,
-                actualDurationMinutes = durationMinutes,
-                totalWeightLifted = totalWeight
             )
-                .onSuccess { _saveSessionState.value = SaveSessionState.Saved }
-                .onFailure { _saveSessionState.value = SaveSessionState.Error(it.message ?: "Failed to save session") }
+                .onSuccess {
+                    stopTimer()
+                    _saveSessionState.value = SaveSessionState.Saved
+                }
+                .onFailure {
+                    _saveSessionState.value = SaveSessionState.Error(it.message ?: "Failed to save session")
+                }
         }
     }
 
@@ -152,13 +138,5 @@ class ActiveWorkoutViewModel(
                 exercises = current.workout.exercises.filter { it.routineExerciseId != routineExerciseId }
             )
         )
-    }
-
-    fun abandonWorkout() {
-        val sessionId = currentSessionId ?: return
-        stopTimer()
-        viewModelScope.launch {
-            sessionRepository.deleteSession(sessionId)
-        }
     }
 }
