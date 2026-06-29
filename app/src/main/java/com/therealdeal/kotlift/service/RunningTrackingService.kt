@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.therealdeal.kotlift.model.RunSession
 import com.therealdeal.kotlift.model.Track
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -40,6 +41,16 @@ class RunningTrackingService : Service() {
         const val CHANNEL_ID = "location_tracking"
         fun clearTrack() {
             track.update { it.copy(points = emptyList()) }
+        }
+
+        fun toSession(): RunSession{
+            track.value.startTime
+            return RunSession(
+                id = "",
+                date = track.value.startTime,
+                distanceKm = track.value.distanceKm,
+                durationSeconds = (Clock.System.now() - track.value.startTime).inWholeSeconds.toInt()
+            )
         }
     }
 

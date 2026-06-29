@@ -149,6 +149,7 @@ fun ProfileHeaderSection(
             Text(
                 text = "Profile Photo",
                 style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
             )
             Column(

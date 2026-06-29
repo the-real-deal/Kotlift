@@ -25,6 +25,7 @@ import com.therealdeal.kotlift.model.WorkoutDifficulty
 import com.therealdeal.kotlift.ui.composables.chips.ChipSize
 import com.therealdeal.kotlift.ui.composables.chips.GenericChip
 import com.therealdeal.kotlift.ui.theme.IconYellow
+import com.therealdeal.kotlift.ui.theme.IconYellowText
 
 @Composable
 fun WorkoutCard(
@@ -53,17 +54,28 @@ fun WorkoutCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            data class ChipColorData(
+                val chipText: Color,
+                val chipBackground: Color
+            )
+
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 val chipColor = when (workout.difficulty) {
-                    WorkoutDifficulty.Beginner -> MaterialTheme.colorScheme.primary
-                    WorkoutDifficulty.Intermediate -> IconYellow
-                    WorkoutDifficulty.Advanced -> MaterialTheme.colorScheme.error
+                    WorkoutDifficulty.Beginner -> ChipColorData(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                    WorkoutDifficulty.Intermediate -> ChipColorData(
+                        IconYellowText,
+                        IconYellow.copy(alpha = 0.2f))
+                    WorkoutDifficulty.Advanced -> ChipColorData(
+                        MaterialTheme.colorScheme.error,
+                        MaterialTheme.colorScheme.error.copy(alpha = 0.2f))
                 }
                 GenericChip(
                     text = workout.difficulty.toString(),
                     size = ChipSize.Small,
-                    backgroundColor = chipColor.copy(alpha = 0.2f),
-                    textColor = chipColor
+                    backgroundColor = chipColor.chipBackground,
+                    textColor = chipColor.chipText
                 )
 
                 val durationText =  workout.estimatedTimeMinutes.toString() + " min"

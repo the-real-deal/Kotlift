@@ -18,6 +18,8 @@ val InfoBlue = Color(0xFF2196F3)
 
 val IconRed = Color(0xFFFF4500)
 val IconYellow = Color(0xFFFFD700)
+
+val IconYellowText = Color(0xFF7A5C00)
 val IconPurple = Color(0xFF3F51B5)
 val IconBlue = Color(0xFF2196F3)
 

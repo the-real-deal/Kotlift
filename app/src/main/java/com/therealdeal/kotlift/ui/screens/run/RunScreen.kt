@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.DirectionsRun
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,61 +33,69 @@ fun RunScreen(
     onNavigate: (RunNavigation) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (uiState.runningSession.isEmpty()) {
-            RunEmptyState(modifier = Modifier.padding(innerPadding))
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(top = innerPadding.calculateTopPadding())
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
+    if(uiState.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (uiState.runningSession.isEmpty()) {
+                RunEmptyState(modifier = Modifier.padding(innerPadding))
+            } else {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.padding(top = 16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(top = innerPadding.calculateTopPadding())
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    Text(
-                        "Running Sessions",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Text(
-                        "Every mile counts. Keep moving!",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp
-                    )
-                }
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(uiState.runningSession, key = { it.id }) { session ->
-                        RunSessionCard(session = session)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.padding(top = 16.dp)
+                    ) {
+                        Text(
+                            "Running Sessions",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(
+                            "Every kilometer counts. Keep moving!",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 14.sp
+                        )
+                    }
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(uiState.runningSession, key = { it.id }) { session ->
+                            RunSessionCard(session = session)
+                        }
                     }
                 }
             }
+            ExtendedFloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
+                onClick = { onNavigate(RunNavigation.RunningNavigation) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.DirectionsRun,
+                        contentDescription = null
+                    )
+                },
+                text = { Text("New run", color = MaterialTheme.colorScheme.onPrimary) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = 16.dp,
+                        bottom = 16.dp
+                    )
+            )
         }
-        ExtendedFloatingActionButton(
-            containerColor = MaterialTheme.colorScheme.primary,
-            onClick = { onNavigate(RunNavigation.RunningNavigation) },
-            icon = {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.DirectionsRun,
-                    contentDescription = null
-                )
-            },
-            text = { Text("New run", color = MaterialTheme.colorScheme.onPrimary) },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(
-                    end = 16.dp,
-                    bottom = 16.dp
-                )
-        )
     }
 }
 
@@ -95,6 +104,10 @@ fun RunSessionCard(
     session: RunSession,
     modifier: Modifier = Modifier
 ) {
+    val avgSpeedKmh = if (session.durationSeconds > 0) {
+        session.distanceKm / (session.durationSeconds / 3600.0)
+    } else 0.0
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -166,7 +179,26 @@ fun RunSessionCard(
                         )
                     },
                     value = session.durationSeconds.formatDuration(),
-                    unit = "h  m  s"
+                    unit = "hh:mm:ss"
+                )
+
+                VerticalDivider(
+                    modifier = Modifier.height(48.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    thickness = 0.5.dp
+                )
+
+                RunStat(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Speed,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    value = "%.1f".format(avgSpeedKmh),
+                    unit = "km/h"
                 )
             }
         }

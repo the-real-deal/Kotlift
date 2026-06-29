@@ -32,7 +32,8 @@ fun SessionCard(session: Session) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = session.workoutTitle,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(

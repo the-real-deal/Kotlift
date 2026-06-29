@@ -75,7 +75,6 @@ import kotlin.time.Clock
 
 @Composable
 fun RunningScreen(
-    innerPadding : PaddingValues,
     viewModel: RunningViewModel = koinViewModel(),
     onNavigate: (RunNavigation) -> Unit) {
 
@@ -180,7 +179,10 @@ fun RunningScreen(
                 }
 
                 if (!isTracking && runningStats.points.isNotEmpty()) {
-                    OutlinedButton(onClick = { viewModel.clearTrack() }) {
+                    OutlinedButton(onClick = {
+                        viewModel.clearTrack()
+                        viewModel.saveRun()
+                    }) {
                         Text("Clear Track")
                     }
                 }
