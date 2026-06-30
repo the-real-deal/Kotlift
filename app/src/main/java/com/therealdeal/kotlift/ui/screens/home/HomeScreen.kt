@@ -20,7 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.therealdeal.kotlift.model.Profile
 import com.therealdeal.kotlift.model.Session
 import com.therealdeal.kotlift.navigation.HomeNavigation
-import com.therealdeal.kotlift.ui.composables.cards.QuickStartCard
+import com.therealdeal.kotlift.ui.composables.cards.CreateWorkoutCard
 import com.therealdeal.kotlift.ui.composables.cards.SmallActionCard
 import com.therealdeal.kotlift.ui.composables.cards.StatCard
 import com.therealdeal.kotlift.ui.composables.headers.HomeHeader
@@ -95,7 +95,7 @@ private fun HomeContent(
                 StatCard("Trophy", profile.unlockedAchievementsCount.toString(), Icons.Default.EmojiEvents, IconYellow, Modifier.weight(1f))
             }
 
-            QuickStartCard("Ready to Train?", "Start your workout now") { onNavigate(HomeNavigation.CreateWorkout) }
+            CreateWorkoutCard("Create a new workout?", "Start your workout now") { onNavigate(HomeNavigation.CreateWorkout) }
 
             if (latestSessions.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))

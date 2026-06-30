@@ -73,7 +73,7 @@ fun CreateWorkoutScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text("Create workout") },
+                title = { Text("Create workout", color = MaterialTheme.colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = { onNavigate(CreateNavigation.Back) }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -108,7 +108,7 @@ fun CreateWorkoutScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Save workout")
+                        Text("Save workout", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
@@ -182,7 +182,8 @@ fun CreateWorkoutScreen(
                     Text(
                         text = "Difficulty *",
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -195,7 +196,7 @@ fun CreateWorkoutScreen(
                                     .weight(1f)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(
-                                        if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                                        if (isSelected) MaterialTheme.colorScheme.primary
                                         else MaterialTheme.colorScheme.surface
                                     )
                                     .border(
@@ -214,7 +215,7 @@ fun CreateWorkoutScreen(
                                 Text(
                                     text = level.name,
                                     style = MaterialTheme.typography.labelLarge,
-                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary
                                     else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -237,7 +238,8 @@ fun CreateWorkoutScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Exercises *", style = MaterialTheme.typography.titleLarge)
+                    Text("Exercises *", style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground)
                     Text(
                         "${state.exercises.size} added",
                         style = MaterialTheme.typography.bodyMedium,
@@ -334,7 +336,7 @@ private fun CreateExerciseCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -346,7 +348,8 @@ private fun CreateExerciseCard(
                 Text(
                     text = exercise.name.replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 IconButton(onClick = onDeleteClick) {
                     Icon(

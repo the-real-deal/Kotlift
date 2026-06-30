@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Bolt
 //import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material3.Button
@@ -29,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun QuickStartCard(title : String, subtitle : String, onClick : () -> Unit) {
+fun CreateWorkoutCard(title : String, subtitle : String, onClick : () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -57,7 +56,7 @@ fun QuickStartCard(title : String, subtitle : String, onClick : () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
-                    Text("Browse Workouts", color = MaterialTheme.colorScheme.primary)
+                    Text("Create Workouts", color = MaterialTheme.colorScheme.primary)
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,
