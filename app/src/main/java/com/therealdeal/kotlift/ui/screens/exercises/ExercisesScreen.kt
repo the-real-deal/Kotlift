@@ -105,7 +105,7 @@ fun ExercisesScreen(
                             selectionMode = selectionMode,
                             onClick = {
                                 if (selectionMode) {
-                                    onNavigate(ExercisesNavigation.ExerciseSelected(exercise.id))
+                                    onNavigate(ExercisesNavigation.ExerciseSelected(exercise.id, exercise.name))
                                 } else {
                                     onNavigate(ExercisesNavigation.ExerciseDetail(exercise.id))
                                 }

@@ -39,7 +39,7 @@ sealed class ExerciseDetailNavigation(val route: Route?) {
 sealed class ExercisesNavigation(val route: Route?) {
     data class ExerciseDetail(val id: String) : ExercisesNavigation(Route.ExerciseDetail(id))
     object Back : ExercisesNavigation(null)
-    data class ExerciseSelected(val exerciseId: String) : ExercisesNavigation(null)  // ← nuovo
+    data class ExerciseSelected(val exerciseId: String, val exerciseName: String) : ExercisesNavigation(null)
 }
 
 // ... resto invariato
@@ -52,6 +52,7 @@ sealed class StatsNavigation(val route: Route?) {
 
 sealed class CreateNavigation(val route: Route?) {
     object Back : CreateNavigation(null)
+    object OpenExercisePicker : CreateNavigation(Route.Exercises(selectionMode = true))
 }
 
 sealed class WorkoutDetailNavigation(val route: Route?) {

@@ -116,11 +116,9 @@ fun NavGraph(
                                 navController,
                                 Route.ExerciseDetail(nav.id)
                             )
-                            // Torna indietro passando l'id selezionato tramite savedStateHandle
                             is ExercisesNavigation.ExerciseSelected -> {
-                                navController.previousBackStackEntry
-                                    ?.savedStateHandle
-                                    ?.set("selected_exercise_id", nav.exerciseId)
+                                navController.previousBackStackEntry?.savedStateHandle?.set("selected_exercise_id", nav.exerciseId)
+                                navController.previousBackStackEntry?.savedStateHandle?.set("selected_exercise_name", nav.exerciseName)
                                 navController.popBackStack()
                             }
                         }
@@ -193,7 +191,19 @@ fun NavGraph(
             }
 
             slideComposable<Route.CreateWorkout> {
-                CreateWorkoutScreen({}, innerPadding)
+                CreateWorkoutScreen(
+                    onNavigate = { nav ->
+                        when (nav) {
+                            CreateNavigation.Back -> navController.popBackStack()
+                            CreateNavigation.OpenExercisePicker -> navigateOnStack(
+                                navController,
+                                Route.Exercises(selectionMode = true)
+                            )
+                        }
+                    },
+                    innerPadding = innerPadding,
+                    navController = navController
+                )
             }
         }
     }
