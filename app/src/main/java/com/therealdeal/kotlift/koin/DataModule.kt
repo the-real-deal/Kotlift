@@ -2,6 +2,7 @@ package com.therealdeal.kotlift.koin
 
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
+import com.therealdeal.kotlift.data.events.SessionEvents
 import com.therealdeal.kotlift.data.repository.AchievementsRepository
 import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.ExerciseDetailRepository
@@ -18,9 +19,10 @@ val Context.dataStore by preferencesDataStore("theme")
 
 val dataModule = module{
     single { get<Context>().dataStore }
+    single<SessionEvents> { SessionEvents() }
     single<AuthRepository>{ AuthRepository(get()) }
     single<WorkoutRepository> { WorkoutRepository(get()) }
-    single<SessionRepository> { SessionRepository(get()) }
+    single<SessionRepository> { SessionRepository(get(), get()) }
     single<StatsRepository> { StatsRepository(get()) }
     single<WorkoutDetailRepository> { WorkoutDetailRepository(get(), get()) }
     single<ExerciseDetailRepository> { ExerciseDetailRepository(get()) }

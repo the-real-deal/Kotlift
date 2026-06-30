@@ -36,3 +36,27 @@ data class SessionDTO(
 data class WorkoutTitleDTO(
     val name: String
 )
+
+@Serializable
+data class CreateSessionRequestDTO(
+    @SerialName("profile_id") val profileId: String,
+    @SerialName("workout_id") val workoutId: String,
+    @SerialName("started_at") val startedAt: String,
+    @SerialName("actual_duration_minutes") val actualDurationMinutes: Int,
+    @SerialName("total_weight_lifted") val totalWeightLifted: Double
+)
+
+@Serializable
+data class CreateSessionExerciseRequestDTO(
+    @SerialName("session_id") val sessionId: String,
+    @SerialName("external_exercise_id") val externalExerciseId: String,
+    @SerialName("order_index") val orderIndex: Int
+)
+
+@Serializable
+data class CreateSessionSetRequestDTO(
+    @SerialName("session_exercise_id") val sessionExerciseId: String,
+    @SerialName("set_order") val setOrder: Int,
+    @SerialName("performed_reps") val performedReps: Int,
+    val weight: Double
+)

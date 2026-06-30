@@ -148,9 +148,10 @@ fun RunSessionCard(
             // Stats row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 RunStat(
+                    modifier = Modifier.weight(1f),
                     icon = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.DirectionsRun,
@@ -170,6 +171,7 @@ fun RunSessionCard(
                 )
 
                 RunStat(
+                    modifier = Modifier.weight(1f),
                     icon = {
                         Icon(
                             imageVector = Icons.Outlined.Schedule,
@@ -189,6 +191,7 @@ fun RunSessionCard(
                 )
 
                 RunStat(
+                    modifier = Modifier.weight(1f),
                     icon = {
                         Icon(
                             imageVector = Icons.Outlined.Speed,

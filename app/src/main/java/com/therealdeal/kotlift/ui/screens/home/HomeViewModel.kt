@@ -1,5 +1,7 @@
 package com.therealdeal.kotlift.ui.screens.home
 
+import androidx.lifecycle.viewModelScope
+import com.therealdeal.kotlift.data.events.SessionEvents
 import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.model.Profile
 import com.therealdeal.kotlift.model.Session
@@ -8,6 +10,7 @@ import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 sealed interface HomeUiState {
     data object Loading : HomeUiState
@@ -20,7 +23,8 @@ sealed interface HomeUiState {
 
 class HomeViewModel(
     authRepository: AuthRepository,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val events: SessionEvents
 ) : BaseViewModel(authRepository) {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
@@ -28,6 +32,9 @@ class HomeViewModel(
 
     init {
         loadHomeData()
+        viewModelScope.launch {
+            events.sessionCreated.collect { loadHomeData() }
+        }
     }
 
     fun loadHomeData() {

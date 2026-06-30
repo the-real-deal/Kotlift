@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.toRoute
@@ -29,8 +30,12 @@ fun navigateOnStack(navController: NavHostController, targetRoute: Route) {
 
 fun navigateAndClear(navController: NavHostController, targetRoute: Route) {
     navController.navigate(targetRoute) {
-        popUpTo(0) { inclusive = true }
+        popUpTo(navController.graph.findStartDestination().id) {
+            inclusive = true
+            saveState = true
+        }
         launchSingleTop = true
+        restoreState = true
     }
 }
 

@@ -1,6 +1,7 @@
 package com.therealdeal.kotlift.ui.screens.run
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import android.graphics.Paint
+import android.location.LocationManager
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +53,7 @@ import com.therealdeal.kotlift.ui.composables.commonComponents.LocationDisabledA
 import com.therealdeal.kotlift.utils.PermissionStatus
 import com.therealdeal.kotlift.utils.rememberMultiplePermissions
 import android.provider.Settings
+import android.widget.Chronometer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Row
@@ -63,6 +66,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.core.location.LocationManagerCompat
 import com.therealdeal.kotlift.model.Track
 import com.therealdeal.kotlift.ui.composables.commonComponents.PermissionDeniedAlert
 import com.therealdeal.kotlift.ui.composables.commonComponents.PermissionPermanentlyDeniedSnackbar
@@ -71,6 +75,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
+fun isLocationEnabled(context: Context): Boolean {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return LocationManagerCompat.isLocationEnabled(locationManager)
+}
+
 @Composable
 fun RunningScreen(
     viewModel: RunningViewModel = koinViewModel()) {
@@ -78,10 +87,18 @@ fun RunningScreen(
     val context = LocalContext.current
     val runningStats by viewModel.trackPoints.collectAsStateWithLifecycle()
     val isTracking by viewModel.isTracking.collectAsStateWithLifecycle()
+    val elapsedSeconds by viewModel.elapsedSeconds.collectAsStateWithLifecycle()
 
     var showLocationDisableAlert by remember { mutableStateOf(false) }
     var showLocationDeniedAlert by remember { mutableStateOf(false) }
     var showLocationPermanentlyDeniedAlert by remember { mutableStateOf(false) }
+
+    val timerText = remember(elapsedSeconds) {
+        val h = elapsedSeconds / 3600
+        val m = (elapsedSeconds % 3600) / 60
+        val s = elapsedSeconds % 60
+        "%02d:%02d:%02d".format(h, m, s)
+    }
 
     val permissionList = listOf(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -91,7 +108,13 @@ fun RunningScreen(
             permissionList
     ) { statuses ->
         when {
-            statuses.any { it.value == PermissionStatus.Granted } -> viewModel.startTracking(context)
+            statuses.any { it.value == PermissionStatus.Granted } -> {
+                if (isLocationEnabled(context)) {
+                    viewModel.startTracking(context)
+                } else {
+                    showLocationDisableAlert = true
+                }
+            }
             statuses.all { it.value == PermissionStatus.PermanentlyDenied } ->
                 showLocationPermanentlyDeniedAlert = true
             else -> showLocationDeniedAlert = true
@@ -101,7 +124,11 @@ fun RunningScreen(
 
     fun startTrackingOrRequestPermission() {
         if (locationPermission.statuses.all { it.value.isGranted }) {
-            viewModel.startTracking(context)
+            if (isLocationEnabled(context)) {
+                viewModel.startTracking(context)
+            } else {
+                showLocationDisableAlert = true
+            }
         } else {
             locationPermission.launchPermissionRequest()
         }
@@ -133,7 +160,9 @@ fun RunningScreen(
                     track = runningStats,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    timerString = timerText,
+                    elapsedSeconds
                 )
             }
 
@@ -171,7 +200,7 @@ fun RunningScreen(
                         viewModel.clearTrack()
                         viewModel.saveRun()
                     }) {
-                        Text("Clear Track")
+                        Text("Save Session")
                     }
                 }
             }
@@ -212,26 +241,21 @@ fun RunningScreen(
 @Composable
 fun TrackStatsOverlay(
     track: Track,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    timerString: String,
+    elapsedSeconds: Long
 ) {
-    val elapsed = remember(track.startTime) {
-        Clock.System.now() - track.startTime
-    }
-
-    val hours   = elapsed.inWholeHours
-    val minutes = (elapsed.inWholeMinutes % 60).toString().padStart(2, '0')
-    val seconds = (elapsed.inWholeSeconds % 60).toString().padStart(2, '0')
-    val durationStr = if (hours > 0) "$hours:$minutes:$seconds" else "$minutes:$seconds"
-
     val distanceKm  = track.distanceKm
     val pointCount  = track.points.size
 
-    val paceStr = if (distanceKm > 0.0) {
-        val paceSecPerKm = (elapsed.inWholeSeconds / distanceKm).toInt()
-        val pm = paceSecPerKm / 60
-        val ps = (paceSecPerKm % 60).toString().padStart(2, '0')
-        "$pm:$ps"
-    } else "—"
+    val paceStr = remember(distanceKm) {
+        if (distanceKm > 0.0) {
+            val paceSecPerKm = (elapsedSeconds / distanceKm).toInt()
+            val pm = paceSecPerKm / 60
+            val ps = (paceSecPerKm % 60).toString().padStart(2, '0')
+            "$pm:$ps"
+        } else "—"
+    }
 
     Card(
         modifier = modifier,
@@ -257,7 +281,7 @@ fun TrackStatsOverlay(
                 }
                 Text("Tracking", fontSize = 13.sp, fontWeight = FontWeight.Medium)
             }
-            Text("▲ $durationStr", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("▲ $timerString", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
         HorizontalDivider(thickness = 0.5.dp)
@@ -348,7 +372,7 @@ fun OsmMapView(
     val polyline = remember {
         Polyline().apply {
             outlinePaint.color = AppGreenDark.toArgb()
-            outlinePaint.strokeWidth = 14f
+            outlinePaint.strokeWidth = 18f
             outlinePaint.strokeCap = Paint.Cap.ROUND
             outlinePaint.strokeJoin = Paint.Join.ROUND
             outlinePaint.isAntiAlias = true
@@ -362,7 +386,7 @@ fun OsmMapView(
                 if (!mapView.overlays.contains(polyline)) {
                     mapView.overlays.add(polyline)
                 }
-                mapView.controller.animateTo(trackPoints.last(), 20.0, 1000L)
+                mapView.controller.animateTo(trackPoints.last(), 18.0, 1000L)
                 mapView.invalidate()
             }
         }
