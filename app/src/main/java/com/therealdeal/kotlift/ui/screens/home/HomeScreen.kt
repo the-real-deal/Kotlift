@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,23 +33,12 @@ import com.therealdeal.kotlift.ui.theme.IconYellow
 import org.koin.androidx.compose.koinViewModel
 import com.therealdeal.kotlift.ui.composables.cards.SessionCard
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
-
 @Composable
 fun HomeScreen(
     onNavigate: (HomeNavigation) -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-//    val lifecycleOwner = LocalLifecycleOwner.current
-//    LaunchedEffect(lifecycleOwner) {
-//        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-//            viewModel.loadHomeData()
-//        }
-//    }
 
     when (val state = uiState) {
         is HomeUiState.Loading -> {

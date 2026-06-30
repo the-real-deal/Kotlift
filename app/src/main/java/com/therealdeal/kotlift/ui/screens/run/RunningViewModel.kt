@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.lifecycle.viewModelScope
 import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.RunningRepository
-import com.therealdeal.kotlift.model.RunSession
 import com.therealdeal.kotlift.service.RunningTrackingService
 import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
 import kotlinx.coroutines.Job
@@ -13,10 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import kotlin.time.Clock
 
 class RunningViewModel(
     authRepository: AuthRepository,

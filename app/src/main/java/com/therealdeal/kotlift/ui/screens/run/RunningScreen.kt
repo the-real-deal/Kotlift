@@ -53,7 +53,6 @@ import com.therealdeal.kotlift.ui.composables.commonComponents.LocationDisabledA
 import com.therealdeal.kotlift.utils.PermissionStatus
 import com.therealdeal.kotlift.utils.rememberMultiplePermissions
 import android.provider.Settings
-import android.widget.Chronometer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Row
@@ -73,7 +72,6 @@ import com.therealdeal.kotlift.ui.composables.commonComponents.PermissionPermane
 import com.therealdeal.kotlift.ui.theme.AppGreenDark
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.time.Clock
 
 fun isLocationEnabled(context: Context): Boolean {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
