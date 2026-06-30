@@ -2,14 +2,12 @@ package com.therealdeal.kotlift.ui.screens.run
 
 import android.Manifest
 import android.content.Intent
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import com.therealdeal.kotlift.navigation.RunNavigation
 import org.koin.androidx.compose.koinViewModel
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -17,7 +15,6 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import android.graphics.Paint
 import android.net.Uri
-import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,14 +66,14 @@ import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.model.Track
 import com.therealdeal.kotlift.ui.composables.commonComponents.PermissionDeniedAlert
 import com.therealdeal.kotlift.ui.composables.commonComponents.PermissionPermanentlyDeniedSnackbar
+import com.therealdeal.kotlift.ui.theme.AppGreenDark
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
 @Composable
 fun RunningScreen(
-    viewModel: RunningViewModel = koinViewModel(),
-    onNavigate: (RunNavigation) -> Unit) {
+    viewModel: RunningViewModel = koinViewModel()) {
 
     val context = LocalContext.current
     val runningStats by viewModel.trackPoints.collectAsStateWithLifecycle()
@@ -86,18 +83,9 @@ fun RunningScreen(
     var showLocationDeniedAlert by remember { mutableStateOf(false) }
     var showLocationPermanentlyDeniedAlert by remember { mutableStateOf(false) }
 
-    val permissionList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        listOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.FOREGROUND_SERVICE_LOCATION
-        )
-    } else {
-        listOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-    }
+    val permissionList = listOf(
+        Manifest.permission.ACCESS_FINE_LOCATION
+    )
 
     val locationPermission = rememberMultiplePermissions(
             permissionList
@@ -112,7 +100,7 @@ fun RunningScreen(
      val snackBarHostState = remember { SnackbarHostState() }
 
     fun startTrackingOrRequestPermission() {
-        if (locationPermission.statuses.any { it.value.isGranted }) {
+        if (locationPermission.statuses.all { it.value.isGranted }) {
             viewModel.startTracking(context)
         } else {
             locationPermission.launchPermissionRequest()
@@ -343,7 +331,6 @@ fun OsmMapView(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val primary = MaterialTheme.colorScheme.primary.toArgb()
 
     val mapView = remember {
         MapView(context).apply {
@@ -360,10 +347,11 @@ fun OsmMapView(
 
     val polyline = remember {
         Polyline().apply {
-            outlinePaint.color = primary
-            outlinePaint.strokeWidth = 8f
+            outlinePaint.color = AppGreenDark.toArgb()
+            outlinePaint.strokeWidth = 14f
             outlinePaint.strokeCap = Paint.Cap.ROUND
             outlinePaint.strokeJoin = Paint.Join.ROUND
+            outlinePaint.isAntiAlias = true
         }
     }
 
@@ -374,7 +362,7 @@ fun OsmMapView(
                 if (!mapView.overlays.contains(polyline)) {
                     mapView.overlays.add(polyline)
                 }
-                mapView.controller.animateTo(trackPoints.last(), 17.0, 1000L)
+                mapView.controller.animateTo(trackPoints.last(), 20.0, 1000L)
                 mapView.invalidate()
             }
         }

@@ -184,7 +184,7 @@ fun NavGraph(
             }
 
             slideComposable<Route.Running> {
-                RunningScreen() {}
+                RunningScreen()
             }
 
             slideComposable<Route.CreateWorkout> {
