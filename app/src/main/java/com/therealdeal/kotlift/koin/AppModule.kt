@@ -27,10 +27,10 @@ val appModule = module {
             .build()
     }
 
-    viewModel { LoginViewModel(get()) }
+    viewModel { LoginViewModel(get(), get()) }
     viewModel { RegisterViewModel(get()) }
     viewModel { WorkoutsViewModel(get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get()) }
     viewModel { StatsViewModel(get(), get()) }
     viewModel { WorkoutDetailViewModel(get(), get(), get()) }
     viewModel { ExerciseDetailViewModel(get(), get(), get()) }

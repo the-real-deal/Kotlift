@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -63,66 +64,75 @@ fun HomeScreen(
             HomeContent(
                 profile = state.profile,
                 latestSessions = state.latestSessions,
-                onNavigate = onNavigate
+                isReloading = state.refreshing,
+                onNavigate = onNavigate,
+                onReload = viewModel::reload
             )
         }
     }
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 private fun HomeContent(
     profile: Profile,
     latestSessions: List<Session>,
-    onNavigate: (HomeNavigation) -> Unit
+    isReloading: Boolean,
+    onNavigate: (HomeNavigation) -> Unit,
+    onReload: () -> Unit
 ) {
     val recentSessions = latestSessions.take(3)
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
+    PullToRefreshBox(
+        isRefreshing = isReloading,
+        onRefresh = onReload
     ) {
-        HomeHeader(profile.username)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+        ) {
+            HomeHeader(profile.username)
 
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = (-30).dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard("Day Streak", profile.dayStreak.toString(), Icons.Default.LocalFireDepartment, IconRed, Modifier.weight(1f))
-                StatCard("Sessions", profile.totalSessions.toString(), Icons.Default.FitnessCenter, AppGreen, Modifier.weight(1f))
-                StatCard("Trophy", profile.unlockedAchievementsCount.toString(), Icons.Default.EmojiEvents, IconYellow, Modifier.weight(1f))
-            }
-
-            CreateWorkoutCard("Create a new workout?", "Start your workout now") { onNavigate(HomeNavigation.CreateWorkout) }
-
-            if (recentSessions.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(24.dp))
-                SectionHeader(
-                    title = "Recent Sessions",
-                    onSeeAllClick = { onNavigate(HomeNavigation.Stats(scrollToAllSessions = true)) }
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                recentSessions.forEach { session ->
-                    SessionCard(session = session)
-                    Spacer(modifier = Modifier.height(8.dp))
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = (-30).dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatCard("Day Streak", profile.dayStreak.toString(), Icons.Default.LocalFireDepartment, IconRed, Modifier.weight(1f))
+                    StatCard("Sessions", profile.totalSessions.toString(), Icons.Default.FitnessCenter, AppGreen, Modifier.weight(1f))
+                    StatCard("Trophy", profile.unlockedAchievementsCount.toString(), Icons.Default.EmojiEvents, IconYellow, Modifier.weight(1f))
                 }
+
+                CreateWorkoutCard("Create a new workout?", "Start your workout now") { onNavigate(HomeNavigation.CreateWorkout) }
+
+                if (recentSessions.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    SectionHeader(
+                        title = "Recent Sessions",
+                        onSeeAllClick = { onNavigate(HomeNavigation.Stats(scrollToAllSessions = true)) }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    recentSessions.forEach { session ->
+                        SessionCard(session = session)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    SmallActionCard("Exercise Library", Icons.AutoMirrored.Filled.MenuBook, IconBlue, { onNavigate(HomeNavigation.Exercises) }, Modifier.weight(1f))
+                    SmallActionCard("Track Progress", Icons.AutoMirrored.Filled.TrendingUp, IconPurple, { onNavigate(HomeNavigation.Stats()) }, Modifier.weight(1f))
+                }
+
+                Spacer(modifier = Modifier.height(50.dp))
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                SmallActionCard("Exercise Library", Icons.AutoMirrored.Filled.MenuBook, IconBlue, { onNavigate(HomeNavigation.Exercises) }, Modifier.weight(1f))
-                SmallActionCard("Track Progress", Icons.AutoMirrored.Filled.TrendingUp, IconPurple, { onNavigate(HomeNavigation.Stats()) }, Modifier.weight(1f))
-            }
-
-            Spacer(modifier = Modifier.height(50.dp))
         }
     }
 }

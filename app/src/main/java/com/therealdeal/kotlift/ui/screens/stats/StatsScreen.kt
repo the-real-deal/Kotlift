@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,120 +65,129 @@ fun StatsScreen(
             StatsContent(
                 stats = state.stats,
                 innerPadding = innerPadding,
-                scrollToAllSessions = scrollToAllSessions
+                scrollToAllSessions = scrollToAllSessions,
+                isReloading = state.isReloading,
+                onReload = viewModel::reload
             )
         }
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StatsContent(
     stats: Stats,
     innerPadding: PaddingValues,
-    scrollToAllSessions: Boolean
+    scrollToAllSessions: Boolean,
+    isReloading: Boolean,
+    onReload: () -> Unit
 ) {
     val allSessionsBringIntoViewRequester = remember { BringIntoViewRequester() }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(top = innerPadding.calculateTopPadding())
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
+    PullToRefreshBox(
+        isRefreshing = isReloading,
+        onRefresh = onReload
+    ){
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(top = innerPadding.calculateTopPadding())
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text(
-                "Your Progress",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                "Performance overview for this week",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 14.sp
-            )
-        }
-
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                MiniStatCard(
-                    "Volume",
-                    formatWeight(stats.totalWeightLifted),
-                    Icons.Default.Scale,
-                    AppGreen,
-                    Modifier.weight(1f)
-                )
-                MiniStatCard(
-                    "Sessions",
-                    stats.totalSessions.toString(),
-                    Icons.Default.FitnessCenter,
-                    IconBlue,
-                    Modifier.weight(1f)
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                MiniStatCard(
-                    "Avg Time",
-                    "${stats.avgSessionMinutes.roundToInt()} min",
-                    Icons.Default.Timer,
-                    IconPurple,
-                    Modifier.weight(1f)
-                )
-                MiniStatCard(
-                    "Top Workout",
-                    stats.mostDoneWorkout?.let { "${it.count}x" } ?: "-",
-                    Icons.AutoMirrored.Filled.TrendingUp,
-                    AppGreen,
-                    Modifier.weight(1f)
-                )
-            }
-        }
-
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(
-                text = "Weekly Activity",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-            WeeklyActivity(
-                data = stats.last7DaysActivity.map { (a, b) -> Pair(a, b * 60) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-        }
-
-        if (stats.allSessions.isNotEmpty()) {
             Column(
-                modifier = Modifier.bringIntoViewRequester(allSessionsBringIntoViewRequester)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.padding(top = 16.dp)
             ) {
-                SectionHeader(title = "All Sessions")
-                stats.allSessions.forEach { session ->
-                    SessionCard(session = session)
-                    Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Your Progress",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    "Performance overview for this week",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 14.sp
+                )
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    MiniStatCard(
+                        "Volume",
+                        formatWeight(stats.totalWeightLifted),
+                        Icons.Default.Scale,
+                        AppGreen,
+                        Modifier.weight(1f)
+                    )
+                    MiniStatCard(
+                        "Sessions",
+                        stats.totalSessions.toString(),
+                        Icons.Default.FitnessCenter,
+                        IconBlue,
+                        Modifier.weight(1f)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    MiniStatCard(
+                        "Avg Time",
+                        "${stats.avgSessionMinutes.roundToInt()} min",
+                        Icons.Default.Timer,
+                        IconPurple,
+                        Modifier.weight(1f)
+                    )
+                    MiniStatCard(
+                        "Top Workout",
+                        stats.mostDoneWorkout?.let { "${it.count}x" } ?: "-",
+                        Icons.AutoMirrored.Filled.TrendingUp,
+                        AppGreen,
+                        Modifier.weight(1f)
+                    )
                 }
             }
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Weekly Activity",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                WeeklyActivity(
+                    data = stats.last7DaysActivity.map { (a, b) -> Pair(a, b * 60) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+            }
+
+            if (stats.allSessions.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.bringIntoViewRequester(allSessionsBringIntoViewRequester)
+                ) {
+                    SectionHeader(title = "All Sessions")
+                    stats.allSessions.forEach { session ->
+                        SessionCard(session = session)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-    }
-
-    LaunchedEffect(scrollToAllSessions, stats.allSessions) {
-        if (scrollToAllSessions && stats.allSessions.isNotEmpty()) {
-            allSessionsBringIntoViewRequester.bringIntoView()
+        LaunchedEffect(scrollToAllSessions, stats.allSessions) {
+            if (scrollToAllSessions && stats.allSessions.isNotEmpty()) {
+                allSessionsBringIntoViewRequester.bringIntoView()
+            }
         }
     }
 }

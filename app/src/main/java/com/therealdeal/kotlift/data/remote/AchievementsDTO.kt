@@ -2,6 +2,7 @@ package com.therealdeal.kotlift.data.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.io.Serial
 import kotlin.time.Instant
 
 @Serializable
@@ -18,4 +19,22 @@ data class AchievementDTO(
     val description: String,
     @SerialName("function_name") val functionName: String,
     val threshold: Int
+)
+
+@Serializable
+data class SessionStartedAt(
+    @SerialName("started_at") val startedAt: String
+)
+
+@Serializable
+data class ProfileStatsUpdate(
+    @SerialName("total_sessions") val totalSessions: Int,
+    @SerialName("day_streak") val dayStreak: Int,
+    @SerialName("unlocked_achievements_count") val unlockedAchievementsCount: Int
+)
+
+@Serializable
+data class ProfileStatsUpdateNoStreak(
+    @SerialName("total_sessions") val totalSessions: Int,
+    @SerialName("unlocked_achievements_count") val unlockedAchievementsCount: Int
 )

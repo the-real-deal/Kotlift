@@ -51,7 +51,6 @@ class ActiveWorkoutViewModel(
     init {
         loadWorkoutDetail()
         startTimer()
-        // Niente startSession() qui — il DB si tocca solo al salvataggio finale
     }
 
     private fun startTimer() {

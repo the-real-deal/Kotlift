@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,25 +85,30 @@ fun WorkoutsScreen(
                 }
 
                 is WorkoutsUiState.Success -> {
-                    if (state.workouts.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(
-                                if (searchQuery.isBlank()) "No workouts created yet"
-                                else "No results for \"$searchQuery\""
-                            )
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(state.workouts, key = { it.id }) { workout ->
-                                WorkoutCard(
-                                    workout = workout,
-                                    onClick = { onNavigate(WorkoutsNavigation.WorkoutDetail(workout.id)) },
-                                    onDeleteClick = { workoutToDelete = workout.id }
+                    PullToRefreshBox(
+                        isRefreshing = state.isReloading,
+                        onRefresh = viewModel::reload,
+                    ) {
+                        if (state.workouts.isEmpty()) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text(
+                                    if (searchQuery.isBlank()) "No workouts created yet"
+                                    else "No results for \"$searchQuery\""
                                 )
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(state.workouts, key = { it.id }) { workout ->
+                                    WorkoutCard(
+                                        workout = workout,
+                                        onClick = { onNavigate(WorkoutsNavigation.WorkoutDetail(workout.id)) },
+                                        onDeleteClick = { workoutToDelete = workout.id }
+                                    )
+                                }
                             }
                         }
                     }

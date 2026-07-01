@@ -60,3 +60,9 @@ data class CreateSessionSetRequestDTO(
     @SerialName("performed_reps") val performedReps: Int,
     val weight: Double
 )
+
+@Serializable
+data class ProfileStreakDTO(@SerialName("day_streak") val dayStreak: Int)
+
+@Serializable
+data class SessionStartedAtDTO(@SerialName("started_at") val startedAt: String)

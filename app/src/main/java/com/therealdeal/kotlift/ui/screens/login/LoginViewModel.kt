@@ -2,6 +2,7 @@ package com.therealdeal.kotlift.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.therealdeal.kotlift.data.repository.AchievementsRepository
 import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.model.Profile
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ data class LoginUiState(
 )
 
 class LoginViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val achievementsRepository: AchievementsRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -44,6 +46,8 @@ class LoginViewModel(
 
             authRepository.login(state.email.trim(), state.password)
                 .onSuccess { user ->
+                    achievementsRepository.checkAllProgress(user.id)
+                    achievementsRepository.updateStats(user.id)
                     _uiState.value = _uiState.value.copy(isLoading = false, loggedInUser = user)
                 }
                 .onFailure { err ->

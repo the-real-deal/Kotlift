@@ -4,14 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.automirrored.outlined.DirectionsRun
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material.icons.outlined.Speed
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,24 +20,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.therealdeal.kotlift.model.RunSession
 import com.therealdeal.kotlift.navigation.RunNavigation
 import com.therealdeal.kotlift.ui.composables.buttons.BottomFloatingButton
 import com.therealdeal.kotlift.ui.composables.cards.RunSessionCard
-import com.therealdeal.kotlift.utils.formatDate
-import com.therealdeal.kotlift.utils.formatDuration
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun RunScreen(
     viewModel: RunViewModel = koinViewModel(),
     innerPadding: PaddingValues,
     onNavigate: (RunNavigation) -> Unit
 ) {
+
     val uiState by viewModel.uiState.collectAsState()
+
     if(uiState.isLoading) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -45,7 +45,11 @@ fun RunScreen(
             CircularProgressIndicator()
         }
     } else {
-        Box(modifier = Modifier.fillMaxSize()) {
+        PullToRefreshBox(
+            isRefreshing = uiState.isReloading,
+            onRefresh = viewModel::reload,
+            modifier = Modifier.fillMaxSize()
+        ) {
             if (uiState.runningSession.isEmpty()) {
                 RunEmptyState(modifier = Modifier.padding(innerPadding))
             } else {
@@ -97,7 +101,7 @@ fun RunScreen(
                     .padding(bottom = 24.dp),
                 icon = {
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
+                        imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
                         contentDescription = "Finish workout"
                     )
                 }

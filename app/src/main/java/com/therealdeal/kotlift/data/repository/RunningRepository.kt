@@ -25,10 +25,22 @@ class RunningRepository(
 
     fun getRunSessionsFlow(userId: String): Flow<Result<List<RunSession>>> =
         _invalidate.flatMapLatest {
-            flow { emit(getSession(userId)) }
-        }
+            flow { emit(getSessionResult(userId)) }
+    }
 
-    suspend fun getSession(userId: String) : Result<List<RunSession>> {
+    suspend fun getSession(userId: String) : List<RunSession> {
+        val sessions = client.postgrest["running_sessions"]
+            .select {
+                filter {
+                    eq("profile_id", userId)
+                }
+            }.decodeList<RunningSessionDTO>()
+        .map { it.toDomain() }
+
+        return sessions
+    }
+
+    suspend fun getSessionResult(userId: String) : Result<List<RunSession>> {
         return runCatching {
             client.postgrest["running_sessions"]
                 .select {

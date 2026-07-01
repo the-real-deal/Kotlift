@@ -16,7 +16,8 @@ import kotlinx.coroutines.flow.update
 data class RunUiState (
     val runningSession : List<RunSession> = listOf(),
     val isLoading : Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isReloading: Boolean = false
 ){
 }
 class RunViewModel(
@@ -28,18 +29,22 @@ class RunViewModel(
     val uiState: StateFlow<RunUiState> = _uiState.asStateFlow()
 
     init {
+        getRunningSessions()
+    }
+
+    fun getRunningSessions() {
+        _uiState.update { it.copy(isLoading = true) }
         withAuth { user ->
-            runningRepository.getRunSessionsFlow(user.id)
-                .onEach { result ->
-                    result
-                        .onSuccess { sessions ->
-                            _uiState.update { it.copy(runningSession = sessions) }
-                        }
-                        .onFailure {
-                            _uiState.update { it.copy(error = "Unable to load running sessions") }
-                        }
-                }
-                .launchIn(viewModelScope)
+            val sessions = runningRepository.getSession(user.id)
+            _uiState.update { it.copy(isLoading = false, runningSession = sessions) }
+        }
+    }
+
+    fun reload() {
+        _uiState.update { it.copy(isReloading = true) }
+        withAuth { user ->
+            val sessions = runningRepository.getSession(user.id)
+            _uiState.update { it.copy( runningSession = sessions, isReloading = false) }
         }
     }
 }

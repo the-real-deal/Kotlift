@@ -5,6 +5,7 @@ import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.WorkoutRepository
 import com.therealdeal.kotlift.model.Workout
 import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
+import com.therealdeal.kotlift.ui.screens.home.HomeUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,9 @@ import kotlinx.coroutines.launch
 
 sealed interface WorkoutsUiState {
     data object Loading : WorkoutsUiState
-    data class Success(val workouts: List<Workout>) : WorkoutsUiState
+    data class Success(
+        val workouts: List<Workout>,
+        val isReloading: Boolean = false) : WorkoutsUiState
     data class Error(val message: String) : WorkoutsUiState
 }
 
@@ -38,34 +41,44 @@ class WorkoutsViewModel(
     private val _allWorkouts = MutableStateFlow<List<Workout>>(emptyList())
 
     init {
-        workoutRepository.getMyWorkoutsFlow()
-            .onEach { result ->
-                result
-                    .onSuccess { workouts ->
-                        _allWorkouts.value = workouts
-                    }
-                    .onFailure { error ->
-                        _uiState.value = WorkoutsUiState.Error(error.message ?: "Error")
-                    }
-            }
-            .launchIn(viewModelScope)
-
-        combine(_allWorkouts, _searchQuery.debounce(300)) { workouts, query ->
-            val filtered = if (query.isBlank()) workouts
-            else workouts.filter { it.name.contains(query, ignoreCase = true) }
-            _uiState.value = WorkoutsUiState.Success(filtered)
-        }.launchIn(viewModelScope)
+        loadWorkouts()
     }
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.update { query }
     }
 
+    fun reload() {
+        val currentState = _uiState.value
+        if (currentState !is WorkoutsUiState.Success) return
+
+        viewModelScope.launch {
+            _uiState.update {
+                (it as? WorkoutsUiState.Success)?.copy(isReloading = true) ?: it
+            }
+            try {
+                workoutRepository.getMyWorkouts()
+                    .onSuccess {
+                        _allWorkouts.value = it
+                        _uiState.value = WorkoutsUiState.Success(workouts = it, isReloading = false)
+                    }
+                    .onFailure {
+                        _uiState.value = WorkoutsUiState.Error(it.message ?: "Error")
+                    }
+            } catch (e: Exception) {
+                _uiState.value = WorkoutsUiState.Error(e.message ?: "Error")
+            }
+        }
+    }
+
     fun loadWorkouts() {
         viewModelScope.launch {
             _uiState.value = WorkoutsUiState.Loading
             workoutRepository.getMyWorkouts()
-                .onSuccess { _allWorkouts.value = it }
+                .onSuccess {
+                    _allWorkouts.value = it
+                    _uiState.value = WorkoutsUiState.Success(workouts = it)
+                }
                 .onFailure { _uiState.value = WorkoutsUiState.Error(it.message ?: "Error") }
         }
     }
