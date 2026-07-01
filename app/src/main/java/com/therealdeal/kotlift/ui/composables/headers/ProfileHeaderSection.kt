@@ -249,7 +249,7 @@ fun ProfileHeaderSection(
                             viewModel.updateProfileImage(null)
                             showDeleteDialog = false
                         }
-                    }   
+                    }
                 ) {
                     Text("Delete")
                 }

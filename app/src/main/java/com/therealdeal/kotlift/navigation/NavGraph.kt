@@ -71,7 +71,7 @@ fun NavGraph(
                 HomeScreen(onNavigate = { nav ->
                     when (nav) {
                         HomeNavigation.Workouts -> navigateAndClear(navController, Route.Workouts)
-                        HomeNavigation.Stats -> navigateAndClear(navController, Route.Stats)
+                        is HomeNavigation.Stats -> navigateAndClear(navController, Route.Stats(nav.scrollToAllSessions))
                         HomeNavigation.Exercises -> navigateOnStack(navController, Route.Exercises())
                         is HomeNavigation.WorkoutDetail -> navigateOnStack(navController, Route.WorkoutDetail(nav.id))
                         HomeNavigation.CreateWorkout -> navigateOnStack(navController, Route.CreateWorkout)
@@ -105,7 +105,6 @@ fun NavGraph(
                 )
             }
 
-            // ← Route.Exercises ora è data class con selectionMode
             slideComposable<Route.Exercises> { backStack ->
                 val route = backStack.toRoute<Route.Exercises>()
                 ExercisesScreen(
@@ -124,7 +123,7 @@ fun NavGraph(
                         }
                     },
                     innerPadding = innerPadding,
-                    selectionMode = route.selectionMode  // ← passato alla screen
+                    selectionMode = route.selectionMode
                 )
             }
 
@@ -145,7 +144,6 @@ fun NavGraph(
                 val route = backStack.toRoute<Route.ActiveWorkout>()
                 ActiveWorkoutScreen(
                     workoutId = route.workoutId,
-                    // Passa il navController per leggere savedStateHandle
                     navController = navController,
                     onNavigate = { nav ->
                         when (nav) {
@@ -164,8 +162,12 @@ fun NavGraph(
                 )
             }
 
-            slideComposable<Route.Stats> {
-                StatsScreen(innerPadding = innerPadding)
+            slideComposable<Route.Stats> { backStack ->
+                val route = backStack.toRoute<Route.Stats>()
+                StatsScreen(
+                    innerPadding = innerPadding,
+                    scrollToAllSessions = route.scrollToAllSessions
+                )
             }
 
             slideComposable<Route.Profile> {

@@ -8,9 +8,9 @@ sealed interface Route {
     @Serializable data object Home : Route
     @Serializable data object Workouts : Route
     @Serializable data class WorkoutDetail(val workoutId: String) : Route
-    @Serializable data class Exercises(val selectionMode: Boolean = false) : Route  // ← modificato
+    @Serializable data class Exercises(val selectionMode: Boolean = false) : Route
     @Serializable data class ExerciseDetail(val exerciseId: String) : Route
-    @Serializable data object Stats : Route
+    @Serializable data class Stats(val scrollToAllSessions: Boolean = false) : Route  // ← modificato
     @Serializable data object Profile : Route
     @Serializable data object Run : Route
     @Serializable data object Running : Route
@@ -20,7 +20,7 @@ sealed interface Route {
 
 sealed class HomeNavigation(val route: Route?) {
     object Workouts : HomeNavigation(Route.Workouts)
-    object Stats : HomeNavigation(Route.Stats)
+    data class Stats(val scrollToAllSessions: Boolean = false) : HomeNavigation(Route.Stats(scrollToAllSessions))  // ← ora passa route
     object Exercises : HomeNavigation(Route.Exercises())
     data class WorkoutDetail(val id: String) : HomeNavigation(Route.WorkoutDetail(id))
     object CreateWorkout : HomeNavigation(Route.CreateWorkout)
@@ -29,7 +29,7 @@ sealed class HomeNavigation(val route: Route?) {
 sealed class ActiveWorkoutNavigation(val route: Route?) {
     data class ExerciseDetail(val id: String) : ActiveWorkoutNavigation(Route.ExerciseDetail(id))
     object Back : ActiveWorkoutNavigation(null)
-    object OpenExercisePicker : ActiveWorkoutNavigation(Route.Exercises(selectionMode = true))  // ← nuovo
+    object OpenExercisePicker : ActiveWorkoutNavigation(Route.Exercises(selectionMode = true))
 }
 
 sealed class ExerciseDetailNavigation(val route: Route?) {
@@ -42,7 +42,6 @@ sealed class ExercisesNavigation(val route: Route?) {
     data class ExerciseSelected(val exerciseId: String, val exerciseName: String) : ExercisesNavigation(null)
 }
 
-// ... resto invariato
 sealed class ProfileNavigation(val route: Route?) {
     object Login: ProfileNavigation(Route.Login)
 }
