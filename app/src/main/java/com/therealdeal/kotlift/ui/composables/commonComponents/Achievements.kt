@@ -121,6 +121,7 @@ fun BadgeItem(achievement: Achievement, onClick: () -> Unit) {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(85.dp)
+            .clip(RoundedCornerShape(12.dp))
             .background(color = containerColor, shape = RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
             .padding(4.dp)
