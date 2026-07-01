@@ -19,16 +19,16 @@ class RunningRepository(
         _invalidate.tryEmit(Unit)
     }
 
-    suspend fun getSessionResult(userId: String) : Result<List<RunSession>> {
-        return runCatching {
-            client.postgrest["running_sessions"]
-                .select {
-                    filter {
-                        eq("profile_id", userId)
-                    }
-                }.decodeList<RunningSessionDTO>()
-                .map { it.toDomain() }
-        }
+    suspend fun getSession(userId: String) : List<RunSession> {
+        val sessions = client.postgrest["running_sessions"]
+            .select {
+                filter {
+                    eq("profile_id", userId)
+                }
+            }.decodeList<RunningSessionDTO>()
+        .map { it.toDomain() }
+
+        return sessions
     }
 
     suspend fun publishNewSession(userId: String, runningSession: RunSession) : Result<RunSession> {
