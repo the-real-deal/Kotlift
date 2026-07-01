@@ -98,7 +98,7 @@ fun ExerciseFilterSheet(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Apply filters", fontWeight = FontWeight.Bold)
+                Text("Apply filters", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }

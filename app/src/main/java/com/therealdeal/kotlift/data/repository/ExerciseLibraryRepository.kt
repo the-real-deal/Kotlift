@@ -1,6 +1,8 @@
 package com.therealdeal.kotlift.data.repository
 
 import com.therealdeal.kotlift.data.remote.ApiResponse
+import com.therealdeal.kotlift.data.remote.BodyPartDTO
+import com.therealdeal.kotlift.data.remote.EquipmentDTO
 import com.therealdeal.kotlift.data.remote.ExerciseDTO
 import com.therealdeal.kotlift.data.remote.ExercisePage
 import com.therealdeal.kotlift.data.remote.MuscleDTO
@@ -10,6 +12,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import kotlin.collections.map
 
 private const val BASE_URL = "https://oss.exercisedb.dev/api/v1"
 private const val PAGE_SIZE = 10
@@ -22,6 +25,34 @@ class ExerciseLibraryRepository(
         return runCatching {
             httpClient.get("$BASE_URL/muscles")
                 .body<ApiResponse<List<MuscleDTO>>>()
+                .data
+                .map { it.name }
+        }
+    }
+
+    /**
+     * Endpoint dedicato /bodyparts, analogo a /muscles: restituisce l'universo
+     * completo delle body parts disponibili, indipendentemente da eventuali
+     * filtri o paginazione applicati altrove.
+     */
+    suspend fun getBodyParts(): Result<List<String>> {
+        return runCatching {
+            httpClient.get("$BASE_URL/bodyparts")
+                .body<ApiResponse<List<BodyPartDTO>>>()
+                .data
+                .map { it.name }
+        }
+    }
+
+    /**
+     * Endpoint dedicato /equipments, analogo a /muscles: restituisce l'universo
+     * completo degli equipment disponibili, indipendentemente da eventuali
+     * filtri o paginazione applicati altrove.
+     */
+    suspend fun getEquipments(): Result<List<String>> {
+        return runCatching {
+            httpClient.get("$BASE_URL/equipments")
+                .body<ApiResponse<List<EquipmentDTO>>>()
                 .data
                 .map { it.name }
         }

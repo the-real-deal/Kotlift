@@ -101,7 +101,6 @@ fun ExercisesScreen(
                             category = exercise.equipment.firstOrNull()?.replaceFirstChar { it.uppercase() } ?: "",
                             target = exercise.targetMuscles.firstOrNull()?.replaceFirstChar { it.uppercase() } ?: "",
                             imageUrl = exercise.gifUrl,
-                            // ← comportamento diverso in base a selectionMode
                             selectionMode = selectionMode,
                             onClick = {
                                 if (selectionMode) {

@@ -44,6 +44,8 @@ class ExercisesViewModel(
 
     init {
         loadMuscles()
+        loadBodyParts()
+        loadEquipments()
         fetchFirstPage()
 
         viewModelScope.launch {
@@ -61,6 +63,31 @@ class ExercisesViewModel(
             exerciseLibraryRepository.getMuscles()
                 .onSuccess { muscles ->
                     _uiState.update { it.copy(muscles = muscles) }
+                }
+        }
+    }
+
+    /**
+     * Caricati UNA SOLA VOLTA all'avvio tramite endpoint dedicati, indipendenti
+     * dai filtri correnti. NON vanno più ricalcolati da fetchFirstPage/loadNextPage:
+     * era proprio quello il bug — le opzioni disponibili venivano derivate dai
+     * risultati già filtrati, quindi collassavano al sottoinsieme selezionato
+     * ogni volta che si applicava un filtro.
+     */
+    private fun loadBodyParts() {
+        viewModelScope.launch {
+            exerciseLibraryRepository.getBodyParts()
+                .onSuccess { bodyParts ->
+                    _uiState.update { it.copy(bodyParts = bodyParts) }
+                }
+        }
+    }
+
+    private fun loadEquipments() {
+        viewModelScope.launch {
+            exerciseLibraryRepository.getEquipments()
+                .onSuccess { equipments ->
+                    _uiState.update { it.copy(equipments = equipments) }
                 }
         }
     }
@@ -86,9 +113,9 @@ class ExercisesViewModel(
                         nextCursor = page.nextCursor,
                         isLoading = false,
                         searchQuery = searchQuery,
-                        filters = filters,
-                        bodyParts = all.flatMap { it.bodyParts }.distinct().sorted(),
-                        equipments = all.flatMap { it.equipment }.distinct().sorted()
+                        filters = filters
+                        // bodyParts/equipments NON toccati qui: arrivano solo da
+                        // loadBodyParts()/loadEquipments(), caricati una sola volta.
                     )
                 }
             }.onFailure { error ->
@@ -121,9 +148,8 @@ class ExercisesViewModel(
                         filteredExercises = newAll,
                         hasNextPage = page.hasNextPage,
                         nextCursor = page.nextCursor,
-                        isLoadingMore = false,
-                        bodyParts = newAll.flatMap { it.bodyParts }.distinct().sorted(),
-                        equipments = newAll.flatMap { it.equipment }.distinct().sorted()
+                        isLoadingMore = false
+                        // bodyParts/equipments NON toccati qui, stesso motivo sopra.
                     )
                 }
             }.onFailure { error ->

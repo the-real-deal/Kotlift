@@ -212,9 +212,6 @@ fun AchievementDetailSheet(
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp))
-
-            DetailRow(label = "Category", value = achievement.name)
-
             if (achievement.isCompleted && achievement.completedAt != null) {
                 DetailRow(label = "Unlocked on", value = formatDate(achievement.completedAt))
             }

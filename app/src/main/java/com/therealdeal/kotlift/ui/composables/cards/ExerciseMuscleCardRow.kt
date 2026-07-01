@@ -27,7 +27,7 @@ fun ExerciseMuscleCardRow(
     ) {
         ExerciseInfoCard(
             icon = Icons.Filled.FitnessCenter,
-            title = "Muscolo Target",
+            title = "Target Muscle",
             value = primaryTarget,
             modifier = Modifier
                 .weight(1f)
@@ -35,7 +35,7 @@ fun ExerciseMuscleCardRow(
         )
         ExerciseInfoCard(
             icon = Icons.Filled.Hub,
-            title = "Sinergici",
+            title = "Synergistic",
             value = secondaryTarget,
             modifier = Modifier
                 .weight(1f)
