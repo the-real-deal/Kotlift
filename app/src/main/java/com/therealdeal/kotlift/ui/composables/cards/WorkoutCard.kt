@@ -71,7 +71,7 @@ fun WorkoutCard(
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                     )
                     WorkoutDifficulty.Intermediate -> ChipColorData(
-                        IconYellowText,
+                        IconYellow,
                         IconYellow.copy(alpha = 0.2f)
                     )
                     WorkoutDifficulty.Advanced -> ChipColorData(

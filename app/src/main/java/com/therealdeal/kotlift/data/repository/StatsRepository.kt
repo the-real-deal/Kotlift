@@ -7,23 +7,35 @@ import com.therealdeal.kotlift.model.WorkoutFrequency
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class StatsRepository(
     private val supabase: SupabaseClient
 ) {
 
+    @OptIn(ExperimentalTime::class)
     suspend fun getStats(): Result<Stats> {
         return runCatching {
             val currentUserId = supabase.auth.currentUserOrNull()?.id
                 ?: error("User not authenticated")
 
             val sessions = supabase.postgrest["sessions"]
-                .select {
+                .select(Columns.raw("""
+                    id,
+                    profile_id,
+                    workout_id,
+                    started_at,
+                    actual_duration_minutes,
+                    total_weight_lifted,
+                    workouts(name)
+                """.trimIndent())) {
                     filter { eq("profile_id", currentUserId) }
                     order("started_at", Order.DESCENDING)
                 }
@@ -34,8 +46,9 @@ class StatsRepository(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun computeStats(sessions: List<Session>): Stats {
-        val now = kotlin.time.Clock.System.now()
+        val now = Clock.System.now()
         val zone = TimeZone.currentSystemDefault()
         val today = now.toLocalDateTime(zone).date
 
@@ -54,7 +67,7 @@ class StatsRepository(
 
         val last30DaysStart = now.minus(30, DateTimeUnit.DAY, zone)
         val mostDoneWorkout = sessions
-            .filter { it.startedAt!! > last30DaysStart }
+            .filter { it.startedAt != null && it.startedAt > last30DaysStart }
             .groupBy { it.workoutId }
             .maxByOrNull { it.value.size }
             ?.let { WorkoutFrequency(workoutId = it.key, count = it.value.size) }

@@ -26,7 +26,7 @@ sealed class BottomNavItem(
 ) {
     data object Home : BottomNavItem(Route.Home, "Home", Icons.Outlined.Home)
     data object Workouts : BottomNavItem(Route.Workouts, "Workouts", Icons.Outlined.FitnessCenter)
-    data object Stats : BottomNavItem(Route.Stats, "Stats", Icons.AutoMirrored.Outlined.TrendingUp)
+    data object Stats : BottomNavItem(Route.Stats(), "Stats", Icons.AutoMirrored.Outlined.TrendingUp)
     data object Run : BottomNavItem(Route.Run, "Run", Icons.AutoMirrored.Outlined.DirectionsRun)
     data object Profile : BottomNavItem(Route.Profile, "Profile", Icons.Outlined.Person)
 }

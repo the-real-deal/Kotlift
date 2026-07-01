@@ -75,6 +75,8 @@ private fun HomeContent(
     latestSessions: List<Session>,
     onNavigate: (HomeNavigation) -> Unit
 ) {
+    val recentSessions = latestSessions.take(3)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -97,11 +99,14 @@ private fun HomeContent(
 
             CreateWorkoutCard("Create a new workout?", "Start your workout now") { onNavigate(HomeNavigation.CreateWorkout) }
 
-            if (latestSessions.isNotEmpty()) {
+            if (recentSessions.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))
-                SectionHeader("Recent Sessions")
+                SectionHeader(
+                    title = "Recent Sessions",
+                    onSeeAllClick = { onNavigate(HomeNavigation.Stats(scrollToAllSessions = true)) }
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                latestSessions.forEach { session ->
+                recentSessions.forEach { session ->
                     SessionCard(session = session)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -114,7 +119,7 @@ private fun HomeContent(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 SmallActionCard("Exercise Library", Icons.AutoMirrored.Filled.MenuBook, IconBlue, { onNavigate(HomeNavigation.Exercises) }, Modifier.weight(1f))
-                SmallActionCard("Track Progress", Icons.AutoMirrored.Filled.TrendingUp, IconPurple, { onNavigate(HomeNavigation.Stats) }, Modifier.weight(1f))
+                SmallActionCard("Track Progress", Icons.AutoMirrored.Filled.TrendingUp, IconPurple, { onNavigate(HomeNavigation.Stats()) }, Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(50.dp))

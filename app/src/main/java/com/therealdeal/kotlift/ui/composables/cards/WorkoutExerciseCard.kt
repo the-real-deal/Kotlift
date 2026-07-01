@@ -9,8 +9,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +56,8 @@ fun WorkoutExerciseCard(
     onRemoveExercise: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isImageError by remember(gifUrl) { mutableStateOf(gifUrl.isNullOrBlank()) }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -68,15 +75,33 @@ fun WorkoutExerciseCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                AsyncImage(
-                    model = gifUrl,
-                    contentDescription = exerciseName,
-                    contentScale = ContentScale.Crop,
+                Box(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
-                )
+                        .background(
+                            if (isImageError) Color.White
+                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isImageError) {
+                        Icon(
+                            imageVector = Icons.Default.FitnessCenter,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        AsyncImage(
+                            model = gifUrl,
+                            contentDescription = exerciseName,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                            onError = { isImageError = true }
+                        )
+                    }
+                }
 
                 Column(modifier = Modifier.weight(1f)) {  // ← weight(1f) occupa lo spazio rimasto
                     Text(
