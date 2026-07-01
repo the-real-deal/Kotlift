@@ -38,7 +38,6 @@ class WorkoutsViewModel(
     private val _allWorkouts = MutableStateFlow<List<Workout>>(emptyList())
 
     init {
-        // Osserva il flow reattivo del repository
         workoutRepository.getMyWorkoutsFlow()
             .onEach { result ->
                 result
@@ -51,7 +50,6 @@ class WorkoutsViewModel(
             }
             .launchIn(viewModelScope)
 
-        // Combina lista + searchQuery per filtrare
         combine(_allWorkouts, _searchQuery.debounce(300)) { workouts, query ->
             val filtered = if (query.isBlank()) workouts
             else workouts.filter { it.name.contains(query, ignoreCase = true) }

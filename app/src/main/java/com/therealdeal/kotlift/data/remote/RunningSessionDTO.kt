@@ -22,3 +22,11 @@ class RunningSessionDTO (
         )
     }
 }
+
+@Serializable
+class RunningSessionRequestDTO (
+    @SerialName("created_at") val date: String,
+    @SerialName("meters_run") val meters: Int,
+    @SerialName("seconds_run") val seconds: Int,
+    @SerialName("profile_id") val profileId: String
+)
