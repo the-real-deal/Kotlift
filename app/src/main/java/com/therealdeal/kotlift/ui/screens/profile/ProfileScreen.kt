@@ -22,12 +22,6 @@ import com.therealdeal.kotlift.ui.composables.headers.ProfileHeaderSection
 import com.therealdeal.kotlift.ui.composables.settings.SettingsSection
 import org.koin.androidx.compose.koinViewModel
 
-/*[TODO]
-    - create workout
-    - details session (opt)
-    - activeWorkout
-    - running page */
-
 @Composable
 fun ProfileScreen(
     currentTheme: Theme,

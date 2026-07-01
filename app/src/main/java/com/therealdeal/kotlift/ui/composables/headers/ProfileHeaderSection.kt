@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,10 +45,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.therealdeal.kotlift.model.Profile
 import com.therealdeal.kotlift.ui.screens.profile.ProfileViewModel
-import com.therealdeal.kotlift.utils.rememberCameraLauncher
+import com.therealdeal.kotlift.utils.rememberCameraLauncherWithPermission
+import com.therealdeal.kotlift.utils.rememberGalleryLauncher
 import com.therealdeal.kotlift.utils.saveImageToStorage
 import coil.compose.AsyncImage
 import com.therealdeal.kotlift.utils.deleteImageFromStorage
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +64,10 @@ fun ProfileHeaderSection(
     var showPhotoSheet by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    val (_, takePicture) = rememberCameraLauncher(
-        onPictureTaken = { tempUri ->
+    val scope = rememberCoroutineScope()
+
+    val onNewImagePicked: (android.net.Uri) -> Unit = { tempUri ->
+        scope.launch {
             uiState.profileImageUri?.let { oldUri ->
                 deleteImageFromStorage(context = context, uri = oldUri)
             }
@@ -69,6 +75,14 @@ fun ProfileHeaderSection(
             val savedUri = saveImageToStorage(tempUri, contentResolver)
             viewModel.updateProfileImage(savedUri)
         }
+    }
+
+    val takePicture = rememberCameraLauncherWithPermission(
+        onPictureTaken = onNewImagePicked
+    )
+
+    val pickFromGallery = rememberGalleryLauncher(
+        onImagePicked = onNewImagePicked
     )
 
     val displayUri = uiState.profileImageUri
@@ -159,17 +173,33 @@ fun ProfileHeaderSection(
             ) {
                 ListItem(
                     headlineContent = {
-                        Text("Edit Photo")
+                        Text("Take Photo")
                     },
                     leadingContent = {
                         Icon(
-                            imageVector = Icons.Default.Edit,
+                            imageVector = Icons.Default.CameraAlt,
                             contentDescription = null
                         )
                     },
                     modifier = Modifier.clickable {
                         showPhotoSheet = false
                         takePicture()
+                    }
+                )
+
+                ListItem(
+                    headlineContent = {
+                        Text("Choose from Gallery")
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.PhotoLibrary,
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        showPhotoSheet = false
+                        pickFromGallery()
                     }
                 )
 
@@ -212,16 +242,14 @@ fun ProfileHeaderSection(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        displayUri?.let {
-                            deleteImageFromStorage(
-                                context = context,
-                                uri = it
-                            )
+                        scope.launch {
+                            displayUri?.let {
+                                deleteImageFromStorage(context = context, uri = it)
+                            }
+                            viewModel.updateProfileImage(null)
+                            showDeleteDialog = false
                         }
-
-                        viewModel.updateProfileImage(null)
-                        showDeleteDialog = false
-                    }
+                    }   
                 ) {
                     Text("Delete")
                 }
