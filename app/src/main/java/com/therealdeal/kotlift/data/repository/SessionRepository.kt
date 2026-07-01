@@ -26,22 +26,6 @@ import kotlin.time.Instant
 class SessionRepository(
     private val supabase: SupabaseClient
 ) {
-
-    suspend fun getMySessions(): Result<List<Session>> {
-        return runCatching {
-            val currentUserId = supabase.auth.currentUserOrNull()?.id
-                ?: error("User not authenticated")
-
-            supabase.postgrest["sessions"]
-                .select {
-                    filter { eq("profile_id", currentUserId) }
-                    order("started_at", Order.DESCENDING)
-                }
-                .decodeList<SessionDTO>()
-                .map { it.toDomain() }
-        }
-    }
-
     suspend fun getLatestSessions(limit: Int = 3): Result<List<Session>> {
         return runCatching {
             val currentUserId = supabase.auth.currentUserOrNull()?.id

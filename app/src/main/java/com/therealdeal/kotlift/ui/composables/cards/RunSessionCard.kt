@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.AltRoute
-import androidx.compose.material.icons.automirrored.outlined.DirectionsRun
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Schedule

@@ -2,7 +2,6 @@ package com.therealdeal.kotlift.data.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.io.Serial
 import kotlin.time.Instant
 
 @Serializable

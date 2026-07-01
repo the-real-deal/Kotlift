@@ -5,16 +5,11 @@ import com.therealdeal.kotlift.data.repository.AuthRepository
 import com.therealdeal.kotlift.data.repository.WorkoutRepository
 import com.therealdeal.kotlift.model.Workout
 import com.therealdeal.kotlift.ui.baseAuthentication.BaseViewModel
-import com.therealdeal.kotlift.ui.screens.home.HomeUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
