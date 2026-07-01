@@ -31,11 +31,9 @@ fun navigateOnStack(navController: NavHostController, targetRoute: Route) {
 fun navigateAndClear(navController: NavHostController, targetRoute: Route) {
     navController.navigate(targetRoute) {
         popUpTo(navController.graph.findStartDestination().id) {
-            inclusive = true
             saveState = true
         }
         launchSingleTop = true
-        restoreState = true
     }
 }
 

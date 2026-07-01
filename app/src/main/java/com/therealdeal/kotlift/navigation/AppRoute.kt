@@ -10,7 +10,7 @@ sealed interface Route {
     @Serializable data class WorkoutDetail(val workoutId: String) : Route
     @Serializable data class Exercises(val selectionMode: Boolean = false) : Route
     @Serializable data class ExerciseDetail(val exerciseId: String) : Route
-    @Serializable data class Stats(val scrollToAllSessions: Boolean = false) : Route  // ← modificato
+    @Serializable data class Stats(val scrollToAllSessions: Boolean = false) : Route
     @Serializable data object Profile : Route
     @Serializable data object Run : Route
     @Serializable data object Running : Route
@@ -20,7 +20,7 @@ sealed interface Route {
 
 sealed class HomeNavigation(val route: Route?) {
     object Workouts : HomeNavigation(Route.Workouts)
-    data class Stats(val scrollToAllSessions: Boolean = false) : HomeNavigation(Route.Stats(scrollToAllSessions))  // ← ora passa route
+    data class Stats(val scrollToAllSessions: Boolean = false) : HomeNavigation(Route.Stats(scrollToAllSessions))
     object Exercises : HomeNavigation(Route.Exercises())
     data class WorkoutDetail(val id: String) : HomeNavigation(Route.WorkoutDetail(id))
     object CreateWorkout : HomeNavigation(Route.CreateWorkout)

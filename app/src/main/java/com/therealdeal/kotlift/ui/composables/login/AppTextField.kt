@@ -1,6 +1,7 @@
 package com.therealdeal.kotlift.ui.composables.login
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
 import com.therealdeal.kotlift.ui.theme.AppGreen
 import com.therealdeal.kotlift.ui.theme.SurfaceDark
 import com.therealdeal.kotlift.ui.theme.SurfaceVariantDark
@@ -46,7 +48,7 @@ fun AppTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(text = label, color = colors.onSurfaceVariant) },
+        label = { Text(text = label) },
         leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = colors.onSurfaceVariant) },
         trailingIcon = if (isPassword) {
             {
@@ -60,18 +62,8 @@ fun AppTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = true,
+        shape = RoundedCornerShape(8.dp),
         isError = isError,
-        modifier = modifier.fillMaxWidth(),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = colors.onSurface,
-            unfocusedTextColor = colors.onSurface,
-            focusedContainerColor = colors.surface,
-            unfocusedContainerColor = colors.surface,
-            cursorColor = colors.primary,
-            focusedBorderColor = colors.primary,
-            unfocusedBorderColor = colors.outlineVariant,
-            focusedLabelColor = colors.primary,
-            unfocusedLabelColor = colors.onSurfaceVariant
-        )
+        modifier = modifier.fillMaxWidth()
     )
 }
