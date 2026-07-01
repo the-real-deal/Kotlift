@@ -18,7 +18,7 @@ fun WorkoutsTopBar(
 ) {
     Column(modifier = modifier.padding(top = 16.dp)) {
         Text(
-            text = "Esplora",
+            text = "Your Workout",
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.onBackground
@@ -29,5 +29,6 @@ fun WorkoutsTopBar(
             value = searchText,
             onValueChange = onSearchTextChange
         )
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }

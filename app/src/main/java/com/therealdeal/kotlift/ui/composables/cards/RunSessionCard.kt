@@ -106,7 +106,7 @@ fun RunSessionCard(
                     value = session.durationSeconds.formatDuration(),
                     unit = "hh:mm:ss"
                 )
-                
+
                 RunStat(
                     modifier = Modifier.weight(1f),
                     icon = {
