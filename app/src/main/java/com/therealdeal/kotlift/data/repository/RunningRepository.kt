@@ -5,10 +5,7 @@ import com.therealdeal.kotlift.data.remote.RunningSessionRequestDTO
 import com.therealdeal.kotlift.model.RunSession
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 
 class RunningRepository(
     private val client: SupabaseClient
