@@ -93,12 +93,6 @@ fun RunSessionCard(
                     unit = "km"
                 )
 
-                VerticalDivider(
-                    modifier = Modifier.height(48.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                    thickness = 0.5.dp
-                )
-
                 RunStat(
                     modifier = Modifier.weight(1f),
                     icon = {
@@ -112,13 +106,7 @@ fun RunSessionCard(
                     value = session.durationSeconds.formatDuration(),
                     unit = "hh:mm:ss"
                 )
-
-                VerticalDivider(
-                    modifier = Modifier.height(48.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                    thickness = 0.5.dp
-                )
-
+                
                 RunStat(
                     modifier = Modifier.weight(1f),
                     icon = {

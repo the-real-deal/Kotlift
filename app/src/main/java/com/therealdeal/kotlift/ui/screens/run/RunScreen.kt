@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.DirectionsRun
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Speed
@@ -18,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.therealdeal.kotlift.model.RunSession
 import com.therealdeal.kotlift.navigation.RunNavigation
+import com.therealdeal.kotlift.ui.composables.buttons.BottomFloatingButton
 import com.therealdeal.kotlift.ui.composables.cards.RunSessionCard
 import com.therealdeal.kotlift.utils.formatDate
 import com.therealdeal.kotlift.utils.formatDuration
@@ -71,7 +74,14 @@ fun RunScreen(
                         )
                     }
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            top = 20.dp,
+                            bottom = innerPadding.calculateBottomPadding() + 20.dp,
+                            start = 4.dp,
+                            end = 4.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(uiState.runningSession, key = { it.id }) { session ->
                             RunSessionCard(session = session)
@@ -79,22 +89,18 @@ fun RunScreen(
                     }
                 }
             }
-            ExtendedFloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                onClick = { onNavigate(RunNavigation.RunningNavigation) },
+            BottomFloatingButton(
+                text = "New run",
+                onClick = { onNavigate(RunNavigation.RunningNavigation)  },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 24.dp),
                 icon = {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.DirectionsRun,
-                        contentDescription = null
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Finish workout"
                     )
-                },
-                text = { Text("New run", color = MaterialTheme.colorScheme.onPrimary) },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(
-                        end = 16.dp,
-                        bottom = 16.dp
-                    )
+                }
             )
         }
     }
@@ -117,7 +123,8 @@ fun RunStat(
             text = value,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 20.sp
         )
         Text(
             text = unit,
