@@ -146,7 +146,7 @@ private fun StatsContent(
                     )
                     MiniStatCard(
                         "Top Workout",
-                        stats.mostDoneWorkout?.let { "${it.count}x" } ?: "-",
+                        stats.mostDoneWorkout?.name ?: "-",
                         Icons.AutoMirrored.Filled.TrendingUp,
                         AppGreen,
                         Modifier.weight(1f)

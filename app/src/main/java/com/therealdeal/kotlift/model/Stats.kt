@@ -13,5 +13,6 @@ data class Stats(
 
 data class WorkoutFrequency(
     val workoutId: String,
+    val name: String,
     val count: Int
 )

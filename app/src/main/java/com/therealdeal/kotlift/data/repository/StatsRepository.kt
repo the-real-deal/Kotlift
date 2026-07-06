@@ -70,7 +70,14 @@ class StatsRepository(
             .filter { it.startedAt != null && it.startedAt > last30DaysStart }
             .groupBy { it.workoutId }
             .maxByOrNull { it.value.size }
-            ?.let { WorkoutFrequency(workoutId = it.key, count = it.value.size) }
+            ?.let { entry ->
+                val firstSessionInGroup = entry.value.first()
+                WorkoutFrequency(
+                    workoutId = entry.key,
+                    name = firstSessionInGroup.workoutTitle,
+                    count = entry.value.size
+                )
+            }
 
         return Stats(
             totalWeightLifted = totalWeightLifted,
